@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { X, Eye, EyeOff, Mail, Lock, User, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface AuthModalProps {
@@ -19,18 +19,43 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
       return 'Password must be at least 8 characters long';
     }
     
-    const hasNumberOrSpecial = /[0-9!@#$^&*]/.test(password);
+    const hasNumberOrSpecial = /[0-9!@$%^&*]/.test(password);
     if (!hasNumberOrSpecial) {
-      return 'Password must contain at least one number or special character (!, @, #, $, ^, &, *)';
+      return 'Password must contain at least one number or special character (!, @, $, %, ^, &, *)';
     }
     
     return null;
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setError('');
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      setResetSuccess(true);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,7 +70,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           password,
         });
         
-        if (error) throw error;
+        if (error) {
+          const newAttempts = loginAttempts + 1;
+          setLoginAttempts(newAttempts);
+          
+          if (newAttempts >= 3) {
+            setError('Too many failed login attempts. Please reset your password.');
+            setShowPasswordReset(true);
+            setResetEmail(email);
+          } else {
+            setError(`${error.message} (${newAttempts}/3 attempts)`);
+          }
+          setLoading(false);
+          return;
+        }
       } else {
         // Validate password for signup
         const passwordError = validatePassword(password);
@@ -67,6 +105,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       onClose();
       setEmail('');
       setPassword('');
+      setLoginAttempts(0);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -79,6 +118,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setPassword('');
     setError('');
     setShowPassword(false);
+    setLoginAttempts(0);
+    setShowPasswordReset(false);
+    setResetEmail('');
+    setResetSuccess(false);
   };
 
   const switchMode = () => {
@@ -87,6 +130,114 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   if (!isOpen) return null;
+
+  // Password Reset View
+  if (showPasswordReset) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl max-w-md w-full">
+          {/* Header */}
+          <div className="relative p-6 border-b border-gray-200">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <RefreshCw className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Reset Your Password
+              </h2>
+              <p className="text-gray-600 mt-2">
+                {resetSuccess 
+                  ? 'Check your email for a password reset link'
+                  : 'Enter your email to receive a password reset link'
+                }
+              </p>
+            </div>
+          </div>
+
+          {/* Form */}
+          <div className="p-6">
+            {resetSuccess ? (
+              <div className="text-center space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <p className="text-green-700">
+                    We've sent a password reset link to <strong>{resetEmail}</strong>
+                  </p>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="w-full py-3 px-4 rounded-xl font-semibold bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transition-all duration-200"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordReset} className="space-y-4">
+                {/* Email Field */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="email"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                    <p className="text-red-600 text-sm">{error}</p>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 ${
+                    resetLoading
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105'
+                  }`}
+                >
+                  {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+
+                {/* Back to Login */}
+                <div className="text-center pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPasswordReset(false);
+                      setLoginAttempts(0);
+                      resetForm();
+                    }}
+                    className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                  >
+                    Back to Login
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -162,7 +313,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
               {!isLogin && (
                 <p className="text-xs text-gray-500 mt-1">
-                  Must be at least 8 characters with a number or special character (!, @, #, $, ^, &, *)
+                  Must be at least 8 characters with a number or special character (!, @, $, %, ^, &, *)
                 </p>
               )}
             </div>
@@ -171,6 +322,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-3">
                 <p className="text-red-600 text-sm">{error}</p>
+                {loginAttempts >= 3 && (
+                  <button
+                    onClick={() => {
+                      setShowPasswordReset(true);
+                      setResetEmail(email);
+                    }}
+                    className="mt-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors underline"
+                  >
+                    Reset Password
+                  </button>
+                )}
               </div>
             )}
 
