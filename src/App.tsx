@@ -10,6 +10,7 @@ import { SpiceWheel } from './components/SpiceWheel';
 import { AuthModal } from './components/AuthModal';
 import { useAuth } from './hooks/useAuth';
 import { spices as staticSpices } from './data/spices';
+import { userRankingService } from './services/userRankingService';
 
 function App() {
   const { user, loading, signOut } = useAuth();
@@ -31,15 +32,66 @@ function App() {
     setSpices(staticSpices);
   }, []);
 
+  // Load user rankings when user changes
+  useEffect(() => {
+    const loadUserRankings = async () => {
+      if (!user) {
+        // Clear rankings when user logs out
+        setUserRankings([]);
+        return;
+      }
+
+      setLoadingRankings(true);
+      try {
+        const dbRankings = await userRankingService.loadUserRankings(user.id);
+        
+        // Convert database rankings to UserRanking objects
+        const rankings: UserRanking[] = dbRankings.map(dbRanking => {
+          const spice = staticSpices.find(s => s.id === dbRanking.spice_id);
+          if (!spice) return null;
+          
+          return {
+            spice,
+            rating: dbRanking.rating,
+            rankedAt: new Date(dbRanking.created_at)
+          };
+        }).filter(Boolean) as UserRanking[];
+
+        // Sort rankings by rating (descending) and then by rankedAt (ascending) for ties
+        const sortedRankings = rankings.sort((a, b) => {
+          if (Math.abs(a.rating - b.rating) < 0.05) {
+            return a.rankedAt.getTime() - b.rankedAt.getTime();
+          }
+          return b.rating - a.rating;
+        });
+
+        setUserRankings(sortedRankings);
+      } catch (error) {
+        console.error('Error loading user rankings:', error);
+      } finally {
+        setLoadingRankings(false);
+      }
+    };
+
+    loadUserRankings();
+  }, [user]);
+
   const handleSpiceSelect = (spice: Spice) => {
     setSelectedSpice(spice);
     setEditingRanking(null);
   };
 
   const handleDeleteRating = async (spice: Spice) => {
+    // Remove from local state
     const updatedRankings = userRankings.filter(r => r.spice.id !== spice.id);
     setUserRankings(updatedRankings);
+
+    // Remove from database if user is authenticated
+    if (user) {
+      await userRankingService.deleteRanking(user.id, spice.id);
+    }
   };
+
   const handleRankingClick = (ranking: UserRanking) => {
     setSelectedSpice(ranking.spice);
     setEditingRanking(ranking);
@@ -98,11 +150,9 @@ function App() {
       setUserRankings(sortedRankings);
     }
 
-    // Save to database
+    // Save to database if user is authenticated
     if (user) {
-      rankingService.saveRanking(spice, rating, user.id);
-    } else {
-      rankingService.saveRanking(spice, rating);
+      await userRankingService.saveRanking(user.id, spice.id, rating);
     }
   };
 
@@ -145,6 +195,11 @@ function App() {
         }));
       }
 
+      // Save to database if user is authenticated
+      if (user) {
+        userRankingService.saveRanking(user.id, spice.id, rating);
+      }
+
     }
   };
 
@@ -169,6 +224,10 @@ function App() {
 
     setUserRankings(sortedRankings);
 
+    // Save to database if user is authenticated
+    if (user) {
+      userRankingService.saveRanking(user.id, spiceId, newRating);
+    }
   };
 
   const handleComparisonChoice = (preferNew: boolean) => {
