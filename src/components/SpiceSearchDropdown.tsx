@@ -15,7 +15,7 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
   spices,
   onSpiceSelect,
   onMissingSpiceClick,
-  excludeSpices = []
+  excludeSpices = [],
   isLoggedIn = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
