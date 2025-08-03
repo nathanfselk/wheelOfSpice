@@ -33,7 +33,7 @@ export class MissingSpiceService {
         .select('id')
         .eq('user_id', userId)
         .ilike('spice_name', cleanSpiceName)
-        .single();
+        .maybeSingle();
 
       if (checkError && checkError.code !== 'PGRST116') {
         console.error('Error checking existing submission:', checkError);
