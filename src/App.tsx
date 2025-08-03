@@ -10,7 +10,6 @@ import { SpiceWheel } from './components/SpiceWheel';
 import { AuthModal } from './components/AuthModal';
 import { useAuth } from './hooks/useAuth';
 import { rankingService } from './services/rankingService';
-import { spiceService } from './services/spiceService';
 import { spices as staticSpices } from './data/spices';
 
 function App() {
@@ -30,14 +29,7 @@ function App() {
 
   // Load spices on component mount
   useEffect(() => {
-    const loadSpices = async () => {
-      // Initialize community ratings table first
-      await spiceService.initializeCommunityRatings();
-      // Then load spices with community averages
-      const spicesWithAverages = await spiceService.getSpicesWithCommunityAverages();
-      setSpices(spicesWithAverages);
-    };
-    loadSpices();
+    setSpices(staticSpices);
   }, []);
 
   // Load user rankings when user changes
@@ -70,8 +62,6 @@ function App() {
     // Delete from database
     try {
       await rankingService.deleteRanking(spice.id, user?.id);
-      // Update community averages after deletion
-      updateCommunityAverages();
     } catch (error) {
       console.error('Failed to delete ranking:', error);
       // Revert local state on error
@@ -90,17 +80,6 @@ function App() {
     );
   };
 
-  const updateCommunityAverages = () => {
-    const updateAverages = async () => {
-      try {
-        const spicesWithAverages = await spiceService.getSpicesWithCommunityAverages();
-        setSpices(spicesWithAverages);
-      } catch (error) {
-        console.error('Failed to update community averages:', error);
-      }
-    };
-    updateAverages();
-  };
 
   const insertSpiceAtPosition = (spice: Spice, rating: number, position: number) => {
     const updatedRankings = [...userRankings];
@@ -145,9 +124,6 @@ function App() {
     } else {
       rankingService.saveRanking(spice, rating);
     }
-
-    // Update community averages after inserting spice
-    updateCommunityAverages();
   };
 
   const handleSpiceRank = (spice: Spice, rating: number) => {
@@ -192,8 +168,6 @@ function App() {
       // Save to database
       rankingService.saveRanking(spice, rating, user?.id);
 
-      // Update community averages
-      updateCommunityAverages();
     }
   };
 
@@ -221,8 +195,6 @@ function App() {
     // Save to database/localStorage
     rankingService.saveRanking(spiceToReorder.spice, newRating, user?.id);
 
-    // Update community averages
-    updateCommunityAverages();
   };
 
   const handleComparisonChoice = (preferNew: boolean) => {
