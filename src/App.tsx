@@ -344,9 +344,9 @@ function App() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
               Wheel of Spice
             </h1>
-            <p className="text-gray-600 text-lg">
+            <h2 className="text-gray-600 text-lg font-medium">
               Discover, learn, and rank your favorite spices
-            </p>
+            </h2>
           </div>
           
           <div className="flex justify-center">

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cozy-cat-b583e4.netlify.app/sitemap.xml
