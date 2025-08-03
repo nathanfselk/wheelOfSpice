@@ -379,7 +379,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {!isLogin && showCaptcha && (
               <div className="flex justify-center">
                 <HCaptcha
-                  sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY || "10000000-ffff-ffff-ffff-000000000001"}
+                  sitekey="ES_4abcadd52d0f49d49a4dd77b80ca159f"
                   onVerify={(token) => setCaptchaToken(token)}
                   onExpire={() => setCaptchaToken(null)}
                   onError={() => setCaptchaToken(null)}
