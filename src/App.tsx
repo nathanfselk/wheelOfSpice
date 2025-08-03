@@ -104,7 +104,7 @@ function App() {
   };
 
 
-  const insertSpiceAtPosition = (spice: Spice, rating: number, position: number) => {
+  const insertSpiceAtPosition = async (spice: Spice, rating: number, position: number) => {
     const updatedRankings = [...userRankings];
     const existingIndex = updatedRankings.findIndex(r => r.spice.id === spice.id);
     
@@ -156,7 +156,7 @@ function App() {
     }
   };
 
-  const handleSpiceRank = async (spice: Spice, rating: number) => {
+  const handleSpiceRank = (spice: Spice, rating: number) => {
     const conflictingSpices = findSpicesWithSameRating(rating, spice.id);
     
     if (conflictingSpices.length > 0) {
@@ -197,13 +197,13 @@ function App() {
 
       // Save to database if user is authenticated
       if (user) {
-        userRankingService.saveRanking(user.id, spice.id, rating);
+        await userRankingService.saveRanking(user.id, spice.id, rating);
       }
 
     }
   };
 
-  const handleRankingReorder = (spiceId: string, newRating: number) => {
+  const handleRankingReorder = async (spiceId: string, newRating: number) => {
     const spiceToReorder = userRankings.find(r => r.spice.id === spiceId);
     if (!spiceToReorder) return;
 
@@ -226,7 +226,7 @@ function App() {
 
     // Save to database if user is authenticated
     if (user) {
-      userRankingService.saveRanking(user.id, spiceId, newRating);
+      await userRankingService.saveRanking(user.id, spiceId, newRating);
     }
   };
 
