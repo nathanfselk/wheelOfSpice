@@ -69,7 +69,6 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
           />
           <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>
-        </div>
       </div>
 
       {isOpen && (searchTerm.trim() || !searchTerm) && (
