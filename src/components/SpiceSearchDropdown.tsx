@@ -57,7 +57,18 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
         className="relative cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
+        <div className="flex items-center w-full px-4 py-3 bg-white border-2 border-orange-200 rounded-xl focus-within:border-orange-400 transition-colors">
+          <Search className="w-5 h-5 text-gray-400 mr-3" />
+          <input
+            type="text"
+            placeholder="Search for a spice to rank..."
+            value={searchTerm}
+            onChange={handleInputChange}
+            className="flex-1 outline-none text-gray-700 placeholder-gray-400"
+            onClick={(e) => e.stopPropagation()}
           />
+          <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </div>
         </div>
       </div>
 
