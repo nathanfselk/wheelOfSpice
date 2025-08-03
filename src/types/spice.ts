@@ -15,3 +15,11 @@ export interface UserRanking {
   rating: number;
   rankedAt: Date;
 }
+
+export interface CommunityRating {
+  spice_id: string;
+  average_rating: number;
+  total_ratings: number;
+  rating_sum: number;
+  updated_at: string;
+}

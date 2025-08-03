@@ -11,6 +11,7 @@ import { AuthModal } from './components/AuthModal';
 import { useAuth } from './hooks/useAuth';
 import { spices as staticSpices } from './data/spices';
 import { userRankingService } from './services/userRankingService';
+import { communityRatingService, CommunityRating } from './services/communityRatingService';
 
 function App() {
   const { user, loading, signOut } = useAuth();
@@ -19,6 +20,7 @@ function App() {
   const [userRankings, setUserRankings] = useState<UserRanking[]>([]);
   const [editingRanking, setEditingRanking] = useState<UserRanking | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [communityRatings, setCommunityRatings] = useState<Record<string, CommunityRating>>({});
   const [comparisonState, setComparisonState] = useState<{
     newSpice: Spice;
     rating: number;
@@ -30,7 +32,19 @@ function App() {
   // Initialize spices on component mount
   useEffect(() => {
     setSpices(staticSpices);
+    loadCommunityRatings();
   }, []);
+
+  // Load community ratings
+  const loadCommunityRatings = async () => {
+    try {
+      const spiceIds = staticSpices.map(spice => spice.id);
+      const ratings = await communityRatingService.getCommunityRatings(spiceIds);
+      setCommunityRatings(ratings);
+    } catch (error) {
+      console.error('Error loading community ratings:', error);
+    }
+  };
 
   // Load user rankings when user changes
   useEffect(() => {
@@ -389,6 +403,7 @@ function App() {
           onRank={handleSpiceRank}
           onDelete={handleDeleteRating}
           initialRating={editingRanking?.rating}
+          communityRating={communityRatings[selectedSpice.id]}
         />
       )}
 

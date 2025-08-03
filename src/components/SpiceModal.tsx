@@ -3,6 +3,7 @@ import { X, MapPin, Palette, ChefHat, Star, Trash2 } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { RankingSlider } from './RankingSlider';
 import { SpiceIcon } from './SpiceIcon';
+import { CommunityRating } from '../services/communityRatingService';
 
 interface SpiceModalProps {
   spice: Spice;
@@ -10,6 +11,7 @@ interface SpiceModalProps {
   onRank: (spice: Spice, rating: number) => void;
   onDelete?: (spice: Spice) => void;
   initialRating?: number;
+  communityRating?: CommunityRating;
 }
 
 export const SpiceModal: React.FC<SpiceModalProps> = ({
@@ -17,7 +19,8 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
   onClose,
   onRank,
   onDelete,
-  initialRating
+  initialRating,
+  communityRating
 }) => {
   const [currentRating, setCurrentRating] = useState(initialRating || 5);
 
@@ -100,7 +103,7 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
           </div>
 
           {/* Details Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* Origin */}
             <div className="bg-orange-50 rounded-xl p-4">
               <div className="flex items-center mb-3">
@@ -127,6 +130,24 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Community Rating */}
+            {communityRating && (
+              <div className="bg-purple-50 rounded-xl p-4">
+                <div className="flex items-center mb-3">
+                  <Star className="w-5 h-5 text-purple-600 mr-2" />
+                  <h3 className="font-semibold text-gray-900">Community Rating</h3>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {communityRating.average_rating.toFixed(1)}/10
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Based on {communityRating.total_ratings} rating{communityRating.total_ratings !== 1 ? 's' : ''}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Common Uses */}
