@@ -156,7 +156,7 @@ function App() {
     }
   };
 
-  const handleSpiceRank = (spice: Spice, rating: number) => {
+  const handleSpiceRank = async (spice: Spice, rating: number) => {
     const conflictingSpices = findSpicesWithSameRating(rating, spice.id);
     
     if (conflictingSpices.length > 0) {
