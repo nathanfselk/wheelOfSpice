@@ -1,18 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, Plus } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { SpiceIcon } from './SpiceIcon';
 
 interface SpiceSearchDropdownProps {
   spices: Spice[];
   onSpiceSelect: (spice: Spice) => void;
+  onMissingSpiceClick: () => void;
   excludeSpices?: string[];
+  isLoggedIn?: boolean;
 }
 
 export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
   spices,
   onSpiceSelect,
+  onMissingSpiceClick,
   excludeSpices = []
+  isLoggedIn = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,9 +76,49 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
             className={`w-5 h-5 text-orange-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
+        {/* Submit Missing Spice Option */}
+        {searchTerm.trim() && isLoggedIn && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <button
+              onClick={() => {
+                onMissingSpiceClick();
+                setIsOpen(false);
+                setSearchTerm('');
+              }}
+              className="w-full px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center justify-center text-sm font-medium"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Submit Missing Spice
+            </button>
+          </div>
+        )}
+        {searchTerm.trim() && !isLoggedIn && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <p className="text-xs text-gray-400">
+              Log in to submit missing spices
+            </p>
+          </div>
+        )}
       </div>
 
       {isOpen && (searchTerm.trim() || !searchTerm) && (
+   
+   {/* Submit Missing Spice Option at bottom when there are results */}
+   {filteredSpices.length > 0 && searchTerm.trim() && isLoggedIn && (
+     <div className="border-t border-gray-200 p-3">
+       <button
+         onClick={() => {
+           onMissingSpiceClick();
+           setIsOpen(false);
+           setSearchTerm('');
+         }}
+         className="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm font-medium"
+       >
+         <Plus className="w-4 h-4 mr-2" />
+         Can't find it? Submit missing spice
+       </button>
+     </div>
+   )}
         <div className="absolute z-50 w-full mt-2 bg-white border border-orange-200 rounded-xl shadow-xl max-h-80 overflow-y-auto">
           {filteredSpices.length === 0 ? (
             <div className="px-4 py-3 text-gray-500 text-center">

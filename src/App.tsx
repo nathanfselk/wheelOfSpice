@@ -9,6 +9,7 @@ import { ComparisonModal } from './components/ComparisonModal';
 import { SpiceWheel } from './components/SpiceWheel';
 import { AuthModal } from './components/AuthModal';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
+import { MissingSpiceModal } from './components/MissingSpiceModal';
 import { useAuth } from './hooks/useAuth';
 import { spices as staticSpices } from './data/spices';
 import { userRankingService } from './services/userRankingService';
@@ -21,6 +22,7 @@ function App() {
   const [userRankings, setUserRankings] = useState<UserRanking[]>([]);
   const [editingRanking, setEditingRanking] = useState<UserRanking | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showMissingSpiceModal, setShowMissingSpiceModal] = useState(false);
   const [communityRatings, setCommunityRatings] = useState<Record<string, CommunityRating>>({});
   const [comparisonState, setComparisonState] = useState<{
     newSpice: Spice;
@@ -282,6 +284,14 @@ function App() {
     setShowAuthModal(false);
   };
 
+  const handleMissingSpiceClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    setShowMissingSpiceModal(true);
+  };
+
   const handleSignOut = async () => {
     await signOut();
   };
@@ -354,7 +364,9 @@ function App() {
             <SpiceSearchDropdown
               spices={spices}
               onSpiceSelect={handleSpiceSelect}
+              onMissingSpiceClick={handleMissingSpiceClick}
               excludeSpices={rankedSpiceIds}
+              isLoggedIn={!!user}
             />
           </div>
         </div>
@@ -432,6 +444,13 @@ function App() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onAuthSuccess={handleAuthSuccess}
+      />
+
+      {/* Missing Spice Modal */}
+      <MissingSpiceModal
+        isOpen={showMissingSpiceModal}
+        onClose={() => setShowMissingSpiceModal(false)}
+        userId={user?.id}
       />
     </div>
   );

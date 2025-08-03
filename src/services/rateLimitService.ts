@@ -16,7 +16,8 @@ export class RateLimitService {
     login: { maxAttempts: 5, windowMs: 15 * 60 * 1000, blockDurationMs: 30 * 60 * 1000 }, // 5 attempts per 15min, block for 30min
     signup: { maxAttempts: 3, windowMs: 60 * 60 * 1000, blockDurationMs: 60 * 60 * 1000 }, // 3 attempts per hour, block for 1 hour
     ranking: { maxAttempts: 50, windowMs: 60 * 60 * 1000, blockDurationMs: 10 * 60 * 1000 }, // 50 rankings per hour, block for 10min
-    passwordReset: { maxAttempts: 3, windowMs: 60 * 60 * 1000, blockDurationMs: 60 * 60 * 1000 } // 3 resets per hour, block for 1 hour
+    passwordReset: { maxAttempts: 3, windowMs: 60 * 60 * 1000, blockDurationMs: 60 * 60 * 1000 }, // 3 resets per hour, block for 1 hour
+    missingSpice: { maxAttempts: 10, windowMs: 60 * 60 * 1000, blockDurationMs: 30 * 60 * 1000 } // 10 submissions per hour, block for 30min
   };
 
   private getKey(action: string, identifier: string): string {

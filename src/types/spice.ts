@@ -23,3 +23,12 @@ export interface CommunityRating {
   rating_sum: number;
   updated_at: string;
 }
+
+export interface MissingSpiceSubmission {
+  id: string;
+  user_id: string;
+  spice_name: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  updated_at: string;
+}
