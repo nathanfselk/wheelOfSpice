@@ -101,12 +101,13 @@ function App() {
     if (sameRatingSpices.length === 0) {
       // No conflicts, just add and sort
       updatedRankings.push(newRanking);
-      setUserRankings(updatedRankings.sort((a, b) => {
+      const sortedRankings = updatedRankings.sort((a, b) => {
         if (Math.abs(a.rating - b.rating) < 0.05) {
           return a.rankedAt.getTime() - b.rankedAt.getTime();
         }
         return b.rating - a.rating;
-      }));
+      });
+      setUserRankings(sortedRankings);
     } else {
       // Insert at the specified position among spices with the same rating
       const insertIndex = updatedRankings.findIndex(r => r === sameRatingSpices[position]);
@@ -115,7 +116,15 @@ function App() {
       } else {
         updatedRankings.push(newRanking);
       }
-      setUserRankings(updatedRankings);
+      
+      // Always sort the rankings after insertion to ensure correct order
+      const sortedRankings = updatedRankings.sort((a, b) => {
+        if (Math.abs(a.rating - b.rating) < 0.05) {
+          return a.rankedAt.getTime() - b.rankedAt.getTime();
+        }
+        return b.rating - a.rating;
+      });
+      setUserRankings(sortedRankings);
     }
 
     // Save to database
