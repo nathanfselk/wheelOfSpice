@@ -69,6 +69,36 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
             <p className="text-gray-700 text-lg leading-relaxed">{spice.description}</p>
           </div>
 
+          {/* Rating Section - Moved up */}
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
+              How much do you like {spice.name}?
+            </h3>
+            
+            <RankingSlider
+              initialRating={initialRating || 5}
+              onRatingChange={setCurrentRating}
+              spiceColor={spice.color}
+            />
+
+            <button
+              onClick={handleRank}
+              className="w-full mt-6 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105"
+            >
+              {initialRating ? 'Update Ranking' : 'Add to My Rankings'}
+            </button>
+
+            {initialRating && onDelete && (
+              <button
+                onClick={handleDelete}
+                className="w-full mt-3 bg-gray-500 hover:bg-red-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Rating
+              </button>
+            )}
+          </div>
+
           {/* Details Grid */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Origin */}
@@ -113,36 +143,6 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Rating Section */}
-          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
-              How much do you like {spice.name}?
-            </h3>
-            
-            <RankingSlider
-              initialRating={initialRating || 5}
-              onRatingChange={setCurrentRating}
-              spiceColor={spice.color}
-            />
-
-            <button
-              onClick={handleRank}
-              className="w-full mt-6 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105"
-            >
-              {initialRating ? 'Update Ranking' : 'Add to My Rankings'}
-            </button>
-
-            {initialRating && onDelete && (
-              <button
-                onClick={handleDelete}
-                className="w-full mt-3 bg-gray-500 hover:bg-red-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Rating
-              </button>
-            )}
           </div>
         </div>
       </div>
