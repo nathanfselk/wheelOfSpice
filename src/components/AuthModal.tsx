@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, Eye, EyeOff, Mail, Lock, User, RefreshCw } from 'lucide-react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { supabase } from '../lib/supabase';
+import { rateLimitService } from '../services/rateLimitService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -24,6 +26,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState('');
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
@@ -40,10 +45,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check rate limit
+    const rateLimit = rateLimitService.checkRateLimit('passwordReset', resetEmail);
+    if (!rateLimit.allowed) {
+      setError(rateLimit.message || 'Too many attempts. Please try again later.');
+      return;
+    }
+    
     setResetLoading(true);
     setError('');
 
     try {
+      // Record the attempt
+      rateLimitService.recordAttempt('passwordReset', resetEmail);
+      
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
@@ -61,9 +77,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setRateLimitError('');
+    
+    // Check rate limit
+    const action = isLogin ? 'login' : 'signup';
+    const rateLimit = rateLimitService.checkRateLimit(action, email);
+    if (!rateLimit.allowed) {
+      setRateLimitError(rateLimit.message || 'Too many attempts. Please try again later.');
+      return;
+    }
+
+    // For signup, require CAPTCHA after showing it
+    if (!isLogin && showCaptcha && !captchaToken) {
+      setError('Please complete the CAPTCHA verification.');
+      return;
+    }
+    
+    setError('');
     setLoading(true);
 
     try {
+      // Record the attempt
+      rateLimitService.recordAttempt(action, email);
+      
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -93,12 +129,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           return;
         }
 
+        // For signup, show CAPTCHA on first attempt
+        if (!showCaptcha) {
+          setShowCaptcha(true);
+          setLoading(false);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/verify-email`,
+            captchaToken: captchaToken || undefined
+          }
         });
         
-        if (error) throw error;
+        if (error) {
+          // Reset CAPTCHA on error
+          setCaptchaToken(null);
+          setShowCaptcha(false);
+          throw error;
+        }
       }
 
       onAuthSuccess();
@@ -117,11 +169,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setEmail('');
     setPassword('');
     setError('');
+    setRateLimitError('');
     setShowPassword(false);
     setLoginAttempts(0);
     setShowPasswordReset(false);
     setResetEmail('');
     setResetSuccess(false);
+    setCaptchaToken(null);
+    setShowCaptcha(false);
   };
 
   const switchMode = () => {
@@ -312,11 +367,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </button>
               </div>
               {!isLogin && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Must be at least 8 characters with a number or special character (!, @, $, %, ^, &, *)
-                </p>
+                <div className="mt-1">
+                  <p className="text-xs text-gray-500">
+                    Must be at least 8 characters with a number or special character (!, @, $, %, ^, &, *)
+                  </p>
+                </div>
               )}
             </div>
+
+            {/* CAPTCHA for signup */}
+            {!isLogin && showCaptcha && (
+              <div className="flex justify-center">
+                <HCaptcha
+                  sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY || "10000000-ffff-ffff-ffff-000000000001"}
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  onError={() => setCaptchaToken(null)}
+                />
+              </div>
+            )}
+
+            {/* Rate Limit Error */}
+            {rateLimitError && (
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-3">
+                <p className="text-orange-600 text-sm">{rateLimitError}</p>
+                <p className="text-orange-500 text-xs mt-1">
+                  Remaining attempts: {rateLimitService.getRemainingAttempts(isLogin ? 'login' : 'signup', email)}
+                </p>
+              </div>
+            )}
 
             {/* Error Message */}
             {error && (
@@ -343,10 +422,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 ${
                 loading
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
+                  : (!isLogin && showCaptcha && !captchaToken)
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
               }`}
             >
-              {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+              {loading ? 'Please wait...' : (isLogin ? 'Sign In' : (!showCaptcha ? 'Continue' : 'Create Account'))}
             </button>
           </form>
 

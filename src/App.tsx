@@ -8,6 +8,7 @@ import { UserRankingList } from './components/UserRankingList';
 import { ComparisonModal } from './components/ComparisonModal';
 import { SpiceWheel } from './components/SpiceWheel';
 import { AuthModal } from './components/AuthModal';
+import { EmailVerificationBanner } from './components/EmailVerificationBanner';
 import { useAuth } from './hooks/useAuth';
 import { spices as staticSpices } from './data/spices';
 import { userRankingService } from './services/userRankingService';
@@ -361,6 +362,13 @@ function App() {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Email Verification Banner */}
+        {user && (
+          <EmailVerificationBanner 
+            userEmail={user.email || undefined}
+          />
+        )}
+        
         {/* Spinning Wheel */}
         {availableSpices.length > 0 && (
           <div className="mb-12">

@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Spice, UserRanking } from '../types/spice';
+import { rateLimitService } from './rateLimitService';
 
 export class UserRankingService {
   /**
@@ -30,7 +31,16 @@ export class UserRankingService {
    * Save or update a user's ranking for a spice
    */
   async saveRanking(userId: string, spiceId: string, rating: number): Promise<boolean> {
+    // Check rate limit for rankings
+    const rateLimit = rateLimitService.checkRateLimit('ranking', userId);
+    if (!rateLimit.allowed) {
+      throw new Error(rateLimit.message || 'Too many ranking attempts. Please slow down.');
+    }
+    
     try {
+      // Record the attempt
+      rateLimitService.recordAttempt('ranking', userId);
+      
       const { error } = await supabase
         .from('user_rankings')
         .upsert({
