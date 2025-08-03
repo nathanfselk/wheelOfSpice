@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 
 export interface CommunityRating {
   spice_id: string;
+  spice_name: string;
   average_rating: number;
   total_ratings: number;
   rating_sum: number;
