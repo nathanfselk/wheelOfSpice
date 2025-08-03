@@ -9,7 +9,6 @@ import { ComparisonModal } from './components/ComparisonModal';
 import { SpiceWheel } from './components/SpiceWheel';
 import { AuthModal } from './components/AuthModal';
 import { useAuth } from './hooks/useAuth';
-import { rankingService } from './services/rankingService';
 import { spices as staticSpices } from './data/spices';
 
 function App() {
@@ -27,27 +26,10 @@ function App() {
   } | null>(null);
   const [loadingRankings, setLoadingRankings] = useState(false);
 
-  // Load spices on component mount
+  // Initialize spices on component mount
   useEffect(() => {
     setSpices(staticSpices);
   }, []);
-
-  // Load user rankings when user changes
-  useEffect(() => {
-    const loadRankings = async () => {
-      setLoadingRankings(true);
-      try {
-        const rankings = await rankingService.loadRankings(user?.id);
-        setUserRankings(rankings);
-      } catch (error) {
-        console.error('Failed to load rankings:', error);
-      } finally {
-        setLoadingRankings(false);
-      }
-    };
-
-    loadRankings();
-  }, [user]);
 
   const handleSpiceSelect = (spice: Spice) => {
     setSelectedSpice(spice);
@@ -55,19 +37,8 @@ function App() {
   };
 
   const handleDeleteRating = async (spice: Spice) => {
-    // Remove from local state
     const updatedRankings = userRankings.filter(r => r.spice.id !== spice.id);
     setUserRankings(updatedRankings);
-
-    // Delete from database
-    try {
-      await rankingService.deleteRanking(spice.id, user?.id);
-    } catch (error) {
-      console.error('Failed to delete ranking:', error);
-      // Revert local state on error
-      const rankings = await rankingService.loadRankings(user?.id);
-      setUserRankings(rankings);
-    }
   };
   const handleRankingClick = (ranking: UserRanking) => {
     setSelectedSpice(ranking.spice);
@@ -174,9 +145,6 @@ function App() {
         }));
       }
 
-      // Save to database
-      rankingService.saveRanking(spice, rating, user?.id);
-
     }
   };
 
@@ -200,9 +168,6 @@ function App() {
     });
 
     setUserRankings(sortedRankings);
-
-    // Save to database/localStorage
-    rankingService.saveRanking(spiceToReorder.spice, newRating, user?.id);
 
   };
 
@@ -245,15 +210,14 @@ function App() {
 
   const handleSignOut = async () => {
     await signOut();
-    setUserRankings([]);
   };
 
-  if (loading || loadingRankings) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-pulse mx-auto mb-4"></div>
-          <p className="text-gray-600">{loading ? 'Loading...' : 'Loading your rankings...'}</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -341,13 +305,13 @@ function App() {
         />
         
         {/* Sign up prompt for anonymous users */}
-        {!user && userRankings.length > 0 && (
+        {!user && (
           <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl shadow-lg p-6 text-center mt-8">
             <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <User className="w-6 h-6 text-orange-500" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Save Your Rankings Forever</h3>
-            <p className="text-gray-600 mb-4">Sign up to keep your spice rankings across devices and never lose your progress!</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Join the Spice Community</h3>
+            <p className="text-gray-600 mb-4">Sign up to connect with other spice enthusiasts and share your flavor journey!</p>
             <button
               onClick={() => setShowAuthModal(true)}
               className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105"
