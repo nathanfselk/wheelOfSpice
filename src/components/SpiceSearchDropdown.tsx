@@ -142,7 +142,7 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
             <div className="border-t border-gray-200 p-3">
               <p className="text-xs text-gray-500 text-center">
                 Log in to submit missing spices
-              </button>
+              </p>
             </div>
           )}
         </div>
