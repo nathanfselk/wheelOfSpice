@@ -23,6 +23,12 @@ export const SpiceWheel: React.FC<SpiceWheelProps> = ({
   const handleSpin = () => {
     if (isSpinning || availableSpices.length === 0) return;
 
+    // If only one spice left, go directly to ranking it
+    if (availableSpices.length === 1) {
+      onSpiceSelect(availableSpices[0]);
+      return;
+    }
+
     setIsSpinning(true);
     
     // Generate random rotation (multiple full rotations + random position)
