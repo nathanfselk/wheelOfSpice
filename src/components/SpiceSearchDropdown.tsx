@@ -74,40 +74,13 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
       {isOpen && (searchTerm.trim() || !searchTerm) && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-orange-200 rounded-xl shadow-xl max-h-80 overflow-y-auto">
           {filteredSpices.length === 0 ? (
-            <div>
-              <div className="px-4 py-3 text-gray-500 text-center">
-                {searchTerm.trim() 
-                  ? 'No spices found matching your search' 
-                  : excludeSpices.length === spices.length 
-                    ? 'All spices have been ranked!' 
-                    : 'No spices found'
-                }
-              </div>
-              
-              {/* Submit Missing Spice Option - only when no matches and user has searched */}
-              {searchTerm.trim() && isLoggedIn && (
-                <div className="border-t border-gray-200 p-3">
-                  <button
-                    onClick={() => {
-                      onMissingSpiceClick();
-                      setIsOpen(false);
-                      setSearchTerm('');
-                    }}
-                    className="w-full px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center justify-center text-sm font-medium"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Submit Missing Spice
-                  </button>
-                </div>
-              )}
-              
-              {searchTerm.trim() && !isLoggedIn && (
-                <div className="border-t border-gray-200 p-3">
-                  <p className="text-xs text-gray-500 text-center">
-                    Log in to submit missing spices
-                  </p>
-                </div>
-              )}
+            <div className="px-4 py-3 text-gray-500 text-center">
+              {searchTerm.trim() 
+                ? 'No spices found matching your search' 
+                : excludeSpices.length === spices.length 
+                  ? 'All spices have been ranked!' 
+                  : 'No spices found'
+              }
             </div>
           ) : (
             filteredSpices.map((spice) => (
@@ -147,8 +120,8 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
             ))
           )}
           
-          {/* Submit Missing Spice Option at bottom when there are results */}
-          {filteredSpices.length > 0 && searchTerm.trim() && isLoggedIn && (
+          {/* Persistent Submit Missing Spice Option */}
+          {isLoggedIn && (
             <div className="border-t border-gray-200 p-3">
               <button
                 onClick={() => {
@@ -159,7 +132,16 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
                 className="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm font-medium"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Can't find it? Submit missing spice
+                Submit Missing Spice
+              </button>
+            </div>
+          )}
+          
+          {/* Login prompt for anonymous users */}
+          {!isLoggedIn && (
+            <div className="border-t border-gray-200 p-3">
+              <p className="text-xs text-gray-500 text-center">
+                Log in to submit missing spices
               </button>
             </div>
           )}
