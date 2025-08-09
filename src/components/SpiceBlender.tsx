@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, X, Beaker, ChefHat, Sparkles, ArrowLeft } from 'lucide-react';
+import { Plus, X, Beaker, ChefHat, Sparkles } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { BlendSpice, BlendSummary } from '../types/blend';
 import { SpiceIcon } from './SpiceIcon';
@@ -7,10 +7,9 @@ import { blendService } from '../services/blendService';
 
 interface SpiceBlenderProps {
   spices: Spice[];
-  onBack: () => void;
 }
 
-export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, onBack }) => {
+export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
   const [selectedSpices, setSelectedSpices] = useState<BlendSpice[]>([]);
   const [showSpiceSelector, setShowSpiceSelector] = useState(false);
   const [blendSummary, setBlendSummary] = useState<BlendSummary | null>(null);
@@ -75,15 +74,7 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, onBack }) =>
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="flex items-center mb-8">
-            <button
-              onClick={onBack}
-              className="flex items-center px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow mr-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Main
-            </button>
+          <div className="mb-8">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
               Your Custom Blend
             </h1>
@@ -198,21 +189,11 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, onBack }) =>
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center mb-8">
-          <button
-            onClick={onBack}
-            className="flex items-center px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow mr-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Main
-          </button>
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              Spice Blender
-            </h1>
-            <p className="text-gray-600 mt-1">Create your perfect spice blend</p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            Spice Blender
+          </h1>
+          <p className="text-gray-600 mt-1">Create your perfect spice blend</p>
         </div>
 
         {/* Instructions */}
