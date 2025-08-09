@@ -330,6 +330,78 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, user }) => {
             </div>
           </div>
         </div>
+
+            {/* Saved Blends Sidebar */}
+            {user && (
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center">
+                      <Clock className="w-5 h-5 mr-2" />
+                      My Saved Blends
+                    </h3>
+                    <p className="text-orange-100 text-sm">
+                      {userBlends.length} saved blend{userBlends.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+
+                  <div className="p-6">
+                    {loadingBlends ? (
+                      <div className="text-center py-8">
+                        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading your blends...</p>
+                      </div>
+                    ) : userBlends.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Beaker className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                        <p className="text-gray-600 mb-2">No saved blends yet</p>
+                        <p className="text-gray-500 text-sm">Create and save your first blend!</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 max-h-96 overflow-y-auto">
+                        {userBlends.map((blend) => (
+                          <div key={blend.id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-gray-900 text-sm">{blend.name}</h4>
+                              <button
+                                onClick={() => handleDeleteBlend(blend.id)}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {blend.spices.map((spice, index) => (
+                                <div key={index} className="flex items-center bg-white rounded px-2 py-1">
+                                  <div
+                                    className="w-3 h-3 rounded-full mr-1"
+                                    style={{ backgroundColor: spice.spice.color }}
+                                  />
+                                  <span className="text-xs text-gray-700">{spice.percentage}%</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleLoadBlend(blend)}
+                                className="flex-1 px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded text-xs font-medium transition-colors flex items-center justify-center"
+                              >
+                                <Edit3 className="w-3 h-3 mr-1" />
+                                Load
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -527,78 +599,6 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, user }) => {
                   : 'Create My Blend'
               }
             </button>
-          </div>
-            </div>
-
-            {/* Saved Blends Sidebar */}
-            {user && (
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4">
-                    <h3 className="text-xl font-bold text-white flex items-center">
-                      <Clock className="w-5 h-5 mr-2" />
-                      My Saved Blends
-                    </h3>
-                    <p className="text-orange-100 text-sm">
-                      {userBlends.length} saved blend{userBlends.length !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-
-                  <div className="p-6">
-                    {loadingBlends ? (
-                      <div className="text-center py-8">
-                        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-gray-600">Loading your blends...</p>
-                      </div>
-                    ) : userBlends.length === 0 ? (
-                      <div className="text-center py-8">
-                        <Beaker className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-600 mb-2">No saved blends yet</p>
-                        <p className="text-gray-500 text-sm">Create and save your first blend!</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4 max-h-96 overflow-y-auto">
-                        {userBlends.map((blend) => (
-                          <div key={blend.id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                            <div className="flex items-start justify-between mb-2">
-                              <h4 className="font-semibold text-gray-900 text-sm">{blend.name}</h4>
-                              <button
-                                onClick={() => handleDeleteBlend(blend.id)}
-                                className="text-gray-400 hover:text-red-500 transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-1 mb-3">
-                              {blend.spices.map((spice, index) => (
-                                <div key={index} className="flex items-center bg-white rounded px-2 py-1">
-                                  <div
-                                    className="w-3 h-3 rounded-full mr-1"
-                                    style={{ backgroundColor: spice.spice.color }}
-                                  />
-                                  <span className="text-xs text-gray-700">{spice.percentage}%</span>
-                                </div>
-                              ))}
-                            </div>
-
-                            <div className="flex space-x-2">
-                              <button
-                                onClick={() => handleLoadBlend(blend)}
-                                className="flex-1 px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded text-xs font-medium transition-colors flex items-center justify-center"
-                              >
-                                <Edit3 className="w-3 h-3 mr-1" />
-                                Load
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
