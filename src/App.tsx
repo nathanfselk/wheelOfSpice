@@ -388,7 +388,7 @@ function App() {
               Spice Ranker
             </h1>
             <h2 className="text-gray-600 text-lg font-medium" itemProp="description">
-              Find the best spices online - Flavor guides and community reviews
+              Find the best spices online - Flavor guides - community reviews
             </h2>
             <div className="mt-4 text-sm text-gray-500">
               <span itemProp="keywords">Premium cooking spices • Flavor profiles • Spice reviews • Quality spices online</span>
