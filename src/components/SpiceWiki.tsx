@@ -43,7 +43,7 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
             </h1>
             <p className="text-gray-600 mt-1">Expert guide to the best cooking spices online - 25+ premium spices with detailed profiles and community ratings</p>
             <div className="mt-2 text-sm text-gray-500">
-              <span>Gourmet spices • Flavor profiles • Origin information • Buying guides • Recipe suggestions</span>
+              <span>Gourmet spices • Flavor profiles • Origin information • Guides • Recipe suggestions</span>
             </div>
           </div>
 
