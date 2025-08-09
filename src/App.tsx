@@ -339,7 +339,6 @@ function App() {
           onSignOut={handleSignOut}
         />
         <SpiceBlender spices={spices} />
-        <SpiceBlender spices={spices} user={user} />
       </>
     );
   }
