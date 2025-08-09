@@ -8,7 +8,7 @@
       - `created_at` (timestamp) - when spice was added
 
   2. Data Population
-    - Insert all 25 spices from the frontend data
+    - Insert all spices from the frontend data
 
   3. Functions
     - `get_spice_name(spice_id_text)` - lookup function to get spice name by ID
