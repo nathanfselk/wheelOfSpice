@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import { Plus, X, Beaker, ChefHat, Sparkles } from 'lucide-react';
+import { Plus, X, Beaker, ChefHat, Sparkles, Save, Trash2, Edit3, Clock } from 'lucide-react';
+import { useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
 import { Spice } from '../types/spice';
-import { BlendSpice, BlendSummary } from '../types/blend';
+import { BlendSpice, BlendSummary, UserBlend } from '../types/blend';
 import { SpiceIcon } from './SpiceIcon';
 import { blendService } from '../services/blendService';
+import { userBlendService } from '../services/userBlendService';
 
 interface SpiceBlenderProps {
   spices: Spice[];
+  user: User | null;
 }
 
-export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
+export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, user }) => {
   const [selectedSpices, setSelectedSpices] = useState<BlendSpice[]>([]);
   const [showSpiceSelector, setShowSpiceSelector] = useState(false);
   const [blendSummary, setBlendSummary] = useState<BlendSummary | null>(null);
   const [blendName, setBlendName] = useState('');
+  const [userBlends, setUserBlends] = useState<UserBlend[]>([]);
+  const [loadingBlends, setLoadingBlends] = useState(false);
+  const [savingBlend, setSavingBlend] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const availableSpices = spices.filter(spice => 
     !selectedSpices.some(bs => bs.spice.id === spice.id)
@@ -22,6 +31,28 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
   const totalPercentage = selectedSpices.reduce((sum, bs) => sum + bs.percentage, 0);
   const canAddSpice = selectedSpices.length < 5;
   const isValidBlend = totalPercentage === 100 && selectedSpices.length >= 2;
+
+  // Load user's saved blends when user changes
+  useEffect(() => {
+    const loadUserBlends = async () => {
+      if (!user) {
+        setUserBlends([]);
+        return;
+      }
+
+      setLoadingBlends(true);
+      try {
+        const blends = await userBlendService.getUserBlends(user.id);
+        setUserBlends(blends);
+      } catch (error) {
+        console.error('Error loading user blends:', error);
+      } finally {
+        setLoadingBlends(false);
+      }
+    };
+
+    loadUserBlends();
+  }, [user]);
 
   const addSpice = (spice: Spice) => {
     if (selectedSpices.length >= 5) return;
@@ -81,6 +112,56 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
     setBlendName(generatedName);
   };
 
+  const handleSaveBlend = async () => {
+    if (!user || !isValidBlend || !blendSummary) return;
+
+    setSavingBlend(true);
+    setSaveError('');
+    setSaveSuccess(false);
+
+    const result = await userBlendService.saveBlend(
+      user.id,
+      blendName,
+      selectedSpices,
+      blendSummary.flavorProfile,
+      blendSummary.commonUses,
+      blendSummary.similarBlends
+    );
+
+    if (result.success) {
+      setSaveSuccess(true);
+      // Reload user blends
+      const blends = await userBlendService.getUserBlends(user.id);
+      setUserBlends(blends);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } else {
+      setSaveError(result.error || 'Failed to save blend');
+    }
+
+    setSavingBlend(false);
+  };
+
+  const handleDeleteBlend = async (blendId: string) => {
+    if (!user) return;
+
+    const result = await userBlendService.deleteBlend(user.id, blendId);
+    if (result.success) {
+      // Reload user blends
+      const blends = await userBlendService.getUserBlends(user.id);
+      setUserBlends(blends);
+    }
+  };
+
+  const handleLoadBlend = (blend: UserBlend) => {
+    setSelectedSpices(blend.spices);
+    setBlendName(blend.name);
+    setBlendSummary({
+      flavorProfile: blend.flavor_profile,
+      commonUses: blend.common_uses,
+      similarBlends: blend.similar_blends
+    });
+  };
+
   const resetBlend = () => {
     setSelectedSpices([]);
     setBlendSummary(null);
@@ -90,7 +171,10 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
   if (blendSummary) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Blend Builder - Main Column */}
+            <div className="lg:col-span-2">
           <div className="mb-8" itemScope itemType="https://schema.org/WebApplication">
             <meta itemProp="name" content="Custom Spice Blend Maker - Create Your Own Spice Blends" />
             <meta itemProp="description" content="Create custom spice blends online with our interactive blend maker. Combine premium spices and get flavor profiles and recipe suggestions." />
@@ -195,13 +279,54 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
 
               {/* Actions */}
               <div className="flex space-x-4 pt-4 border-t border-gray-200">
+                {user && (
+                  <button
+                    onClick={handleSaveBlend}
+                    disabled={savingBlend}
+                    className={`flex-1 px-6 py-3 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center ${
+                      savingBlend
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transform hover:scale-105'
+                    }`}
+                  >
+                    {savingBlend ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Blend
+                      </>
+                    )}
+                  </button>
+                )}
                 <button
                   onClick={resetBlend}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105"
+                  className={`px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105 ${
+                    user ? 'flex-1' : 'w-full'
+                  }`}
                 >
                   Create Another Blend
                 </button>
               </div>
+
+              {/* Save Status Messages */}
+              {saveSuccess && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl">
+                  <p className="text-green-700 text-sm flex items-center">
+                    <Save className="w-4 h-4 mr-2" />
+                    Blend saved successfully!
+                  </p>
+                </div>
+              )}
+
+              {saveError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-red-700 text-sm">{saveError}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -402,6 +527,78 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
                   : 'Create My Blend'
               }
             </button>
+          </div>
+            </div>
+
+            {/* Saved Blends Sidebar */}
+            {user && (
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24">
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center">
+                      <Clock className="w-5 h-5 mr-2" />
+                      My Saved Blends
+                    </h3>
+                    <p className="text-orange-100 text-sm">
+                      {userBlends.length} saved blend{userBlends.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+
+                  <div className="p-6">
+                    {loadingBlends ? (
+                      <div className="text-center py-8">
+                        <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading your blends...</p>
+                      </div>
+                    ) : userBlends.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Beaker className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                        <p className="text-gray-600 mb-2">No saved blends yet</p>
+                        <p className="text-gray-500 text-sm">Create and save your first blend!</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 max-h-96 overflow-y-auto">
+                        {userBlends.map((blend) => (
+                          <div key={blend.id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-gray-900 text-sm">{blend.name}</h4>
+                              <button
+                                onClick={() => handleDeleteBlend(blend.id)}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {blend.spices.map((spice, index) => (
+                                <div key={index} className="flex items-center bg-white rounded px-2 py-1">
+                                  <div
+                                    className="w-3 h-3 rounded-full mr-1"
+                                    style={{ backgroundColor: spice.spice.color }}
+                                  />
+                                  <span className="text-xs text-gray-700">{spice.percentage}%</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleLoadBlend(blend)}
+                                className="flex-1 px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded text-xs font-medium transition-colors flex items-center justify-center"
+                              >
+                                <Edit3 className="w-3 h-3 mr-1" />
+                                Load
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

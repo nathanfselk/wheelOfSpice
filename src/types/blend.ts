@@ -6,6 +6,7 @@ export interface SpiceBlend {
   commonUses: string[];
   similarBlends: string[];
   createdAt: Date;
+  userId?: string;
 }
 
 export interface BlendSpice {
@@ -23,4 +24,16 @@ export interface BlendSummary {
   flavorProfile: string[];
   commonUses: string[];
   similarBlends: string[];
+}
+
+export interface UserBlend {
+  id: string;
+  user_id: string;
+  name: string;
+  spices: BlendSpice[];
+  flavor_profile: string[];
+  common_uses: string[];
+  similar_blends: string[];
+  created_at: string;
+  updated_at: string;
 }
