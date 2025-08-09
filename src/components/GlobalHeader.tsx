@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Star, Beaker, Book } from 'lucide-react';
+import { Menu, X, Star, Beaker, Book, User, LogOut } from 'lucide-react';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface GlobalHeaderProps {
   currentPage: 'main' | 'blender' | 'wiki';
   onPageChange: (page: 'main' | 'blender' | 'wiki') => void;
+  user: SupabaseUser | null;
+  onAuthClick: () => void;
+  onSignOut: () => void;
 }
 
-export const GlobalHeader: React.FC<GlobalHeaderProps> = ({ currentPage, onPageChange }) => {
+export const GlobalHeader: React.FC<GlobalHeaderProps> = ({ 
+  currentPage, 
+  onPageChange, 
+  user, 
+  onAuthClick, 
+  onSignOut 
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -64,9 +74,12 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({ currentPage, onPageC
                   <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-3">
                     <Star className="w-6 h-6 text-white" />
                   </div>
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                  <button
+                    onClick={() => handlePageChange('main')}
+                    className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+                  >
                     Wheel of Spice
-                  </h2>
+                  </button>
                 </div>
                 
                 <nav className="space-y-2">
@@ -90,6 +103,38 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({ currentPage, onPageC
                     );
                   })}
                 </nav>
+                
+                {/* Mobile Auth Section */}
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  {user ? (
+                    <div className="space-y-3">
+                      <div className="text-sm text-gray-600 px-4">
+                        Welcome, {user.email}
+                      </div>
+                      <button
+                        onClick={() => {
+                          onSignOut();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl transition-all"
+                      >
+                        <LogOut className="w-5 h-5 mr-3" />
+                        <span className="font-medium">Sign Out</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        onAuthClick();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all"
+                    >
+                      <User className="w-5 h-5 mr-3" />
+                      <span className="font-medium">Log In / Sign Up</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </>
@@ -108,33 +153,59 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({ currentPage, onPageC
             <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-3">
               <Star className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            <button
+              onClick={() => onPageChange('main')}
+              className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+            >
               Wheel of Spice
-            </h1>
+            </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex space-x-1">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentPage === item.id;
-              
-              return (
+          <div className="flex items-center space-x-4">
+            {/* Navigation */}
+            <nav className="flex space-x-1">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentPage === item.id;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handlePageChange(item.id as 'main' | 'blender' | 'wiki')}
+                    className={`flex items-center px-4 py-2 rounded-lg transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 mr-2" />
+                    <span className="font-medium">{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+            {/* Auth Section */}
+            {user ? (
+              <div className="flex items-center space-x-3">
+                <span className="text-gray-600 text-sm">Welcome, {user.email}</span>
                 <button
-                  key={item.id}
-                  onClick={() => handlePageChange(item.id as 'main' | 'blender' | 'wiki')}
-                  className={`flex items-center px-4 py-2 rounded-lg transition-all ${
-                    isActive
-                      ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  onClick={onSignOut}
+                  className="flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
                 >
-                  <Icon className="w-4 h-4 mr-2" />
-                  <span className="font-medium">{item.label}</span>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
                 </button>
-              );
-            })}
-          </nav>
+              </div>
+            ) : (
+              <button
+                onClick={onAuthClick}
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 text-sm"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Log In / Sign Up
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

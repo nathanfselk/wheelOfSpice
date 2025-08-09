@@ -331,7 +331,13 @@ function App() {
   if (currentPage === 'blender') {
     return (
       <>
-        <GlobalHeader currentPage={currentPage} onPageChange={setCurrentPage} />
+        <GlobalHeader 
+          currentPage={currentPage} 
+          onPageChange={setCurrentPage}
+          user={user}
+          onAuthClick={() => setShowAuthModal(true)}
+          onSignOut={handleSignOut}
+        />
         <SpiceBlender spices={spices} />
       </>
     );
@@ -341,11 +347,24 @@ function App() {
   if (currentPage === 'wiki') {
     return (
       <>
-        <GlobalHeader currentPage={currentPage} onPageChange={setCurrentPage} />
+        <GlobalHeader 
+          currentPage={currentPage} 
+          onPageChange={setCurrentPage}
+          user={user}
+          onAuthClick={() => setShowAuthModal(true)}
+          onSignOut={handleSignOut}
+        />
         <SpiceWiki 
           spices={spices} 
           spiceBlends={spiceBlends}
           onSpiceRank={handleSpiceRank}
+        />
+        
+        {/* Auth Modal */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onAuthSuccess={handleAuthSuccess}
         />
       </>
     );
@@ -353,38 +372,20 @@ function App() {
 
   return (
     <>
-      <GlobalHeader currentPage={currentPage} onPageChange={setCurrentPage} />
+      <GlobalHeader 
+        currentPage={currentPage} 
+        onPageChange={setCurrentPage}
+        user={user}
+        onAuthClick={() => setShowAuthModal(true)}
+        onSignOut={handleSignOut}
+      />
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
       {/* Header */}
       <div>
         <div className="max-w-4xl mx-auto px-4 py-6">
-          {/* Auth Button */}
-          <div className="flex justify-end mb-4">
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-600">Welcome, {user.email}</span>
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowAuthModal(true)}
-                className="flex items-center px-6 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105"
-              >
-                <User className="w-4 h-4 mr-2" />
-                Log In / Sign Up
-              </button>
-            )}
-          </div>
-
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
-              Wheel of Spice
+              Spice Ranker
             </h1>
             <h2 className="text-gray-600 text-lg font-medium">
               Discover, learn, and rank your favorite spices
