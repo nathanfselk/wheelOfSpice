@@ -26,8 +26,10 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
   const addSpice = (spice: Spice) => {
     if (selectedSpices.length >= 5) return;
 
-    const remainingPercentage = 100 - totalPercentage;
-    const defaultPercentage = Math.max(5, Math.min(remainingPercentage, Math.floor(remainingPercentage / (5 - selectedSpices.length))));
+    // Calculate even distribution for all spices including the new one
+    const newSpiceCount = selectedSpices.length + 1;
+    const evenPercentage = Math.floor(100 / newSpiceCount);
+    const remainder = 100 - (evenPercentage * newSpiceCount);
 
     const newBlendSpice: BlendSpice = {
       spice: {
@@ -37,10 +39,25 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
         icon: spice.icon,
         flavorProfile: spice.flavorProfile
       },
-      percentage: defaultPercentage
+      percentage: evenPercentage + (remainder > 0 ? 1 : 0) // Give remainder to first spice
     };
 
-    setSelectedSpices([...selectedSpices, newBlendSpice]);
+    // Redistribute all existing spices to even percentages
+    const redistributedSpices = selectedSpices.map((bs, index) => ({
+      ...bs,
+      percentage: evenPercentage + (index < remainder - 1 ? 1 : 0) // Distribute remainder among first spices
+    }));
+
+    // Add the new spice
+    const updatedSpices = [...redistributedSpices, newBlendSpice];
+    
+    // Ensure total is exactly 100%
+    const currentTotal = updatedSpices.reduce((sum, bs) => sum + bs.percentage, 0);
+    if (currentTotal !== 100) {
+      updatedSpices[0].percentage += (100 - currentTotal);
+    }
+
+    setSelectedSpices(updatedSpices);
     setShowSpiceSelector(false);
   };
 
@@ -97,7 +114,7 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {selectedSpices.map(({ spice, percentage }) => (
-                    <div key={spice.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div key={spice.id} className="flex items-center p-3 bg-orange-50 rounded-lg">
                       <div
                         className="w-8 h-8 rounded-full mr-3 flex items-center justify-center"
                         style={{ backgroundColor: spice.color }}
@@ -120,14 +137,14 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
               {/* Flavor Profile */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2 text-blue-600" />
+                  <Sparkles className="w-5 h-5 mr-2 text-orange-600" />
                   Flavor Profile
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {blendSummary.flavorProfile.map((flavor, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                      className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
                     >
                       {flavor}
                     </span>
@@ -138,13 +155,13 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
               {/* Common Uses */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <ChefHat className="w-5 h-5 mr-2 text-green-600" />
+                  <ChefHat className="w-5 h-5 mr-2 text-orange-600" />
                   Perfect For
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {blendSummary.commonUses.map((use, index) => (
                     <div key={index} className="flex items-center">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
+                      <div className="w-2 h-2 bg-orange-400 rounded-full mr-2" />
                       <span className="text-gray-700">{use}</span>
                     </div>
                   ))}
@@ -174,7 +191,7 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
               <div className="flex space-x-4 pt-4 border-t border-gray-200">
                 <button
                   onClick={resetBlend}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 transform hover:scale-105"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105"
                 >
                   Create Another Blend
                 </button>
@@ -199,13 +216,13 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
         {/* Instructions */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex items-center mb-4">
-            <Beaker className="w-6 h-6 text-purple-600 mr-3" />
+            <Beaker className="w-6 h-6 text-orange-600 mr-3" />
             <h2 className="text-xl font-semibold text-gray-900">How it Works</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
             <div className="flex items-start">
-              <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                <span className="text-purple-600 font-bold text-xs">1</span>
+              <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-orange-600 font-bold text-xs">1</span>
               </div>
               <div>
                 <div className="font-medium text-gray-900">Select Spices</div>
@@ -213,8 +230,8 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
               </div>
             </div>
             <div className="flex items-start">
-              <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                <span className="text-purple-600 font-bold text-xs">2</span>
+              <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-orange-600 font-bold text-xs">2</span>
               </div>
               <div>
                 <div className="font-medium text-gray-900">Set Percentages</div>
@@ -222,8 +239,8 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
               </div>
             </div>
             <div className="flex items-start">
-              <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                <span className="text-purple-600 font-bold text-xs">3</span>
+              <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-orange-600 font-bold text-xs">3</span>
               </div>
               <div>
                 <div className="font-medium text-gray-900">Create Blend</div>
@@ -236,7 +253,7 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
         {/* Blend Builder */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-4">
-            <h3 className="text-xl font-bold text-white">Your Blend</h3>
+            <h3 className="text-xl font-bold text-white">Build Your Blend</h3>
             <p className="text-purple-100">
               {selectedSpices.length}/5 spices • {totalPercentage}% total
             </p>
@@ -308,7 +325,7 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
               <div className="mb-6">
                 <button
                   onClick={() => setShowSpiceSelector(!showSpiceSelector)}
-                  className="w-full px-4 py-3 border-2 border-dashed border-purple-300 rounded-xl text-purple-600 hover:border-purple-400 hover:bg-purple-50 transition-colors flex items-center justify-center"
+                  className="w-full px-4 py-3 border-2 border-dashed border-orange-300 rounded-xl text-orange-600 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center justify-center"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Add Spice ({selectedSpices.length}/5)
@@ -319,13 +336,13 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
             {/* Spice Selector */}
             {showSpiceSelector && (
               <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-                <h4 className="font-semibold text-gray-900 mb-3">Choose a Spice</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">Choose a Spice to Add</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-60 overflow-y-auto">
                   {availableSpices.map(spice => (
                     <button
                       key={spice.id}
                       onClick={() => addSpice(spice)}
-                      className="flex items-center p-3 bg-white rounded-lg hover:bg-purple-50 transition-colors"
+                      className="flex items-center p-3 bg-white rounded-lg hover:bg-orange-50 transition-colors"
                     >
                       <div
                         className="w-6 h-6 rounded-full mr-2 flex items-center justify-center"
@@ -368,7 +385,7 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
               disabled={!isValidBlend}
               className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
                 isValidBlend
-                  ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 transform hover:scale-105'
+                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
