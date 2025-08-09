@@ -101,6 +101,7 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
             <div className="mt-2 text-sm text-gray-500">
               <span>Custom spice blends • Gourmet seasonings • Recipe development • Flavor combinations</span>
             </div>
+          </div>
 
           {/* Blend Summary */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
