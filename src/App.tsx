@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Beaker } from 'lucide-react';
 import { Spice, UserRanking } from './types/spice';
 import { SpiceSearchDropdown } from './components/SpiceSearchDropdown';
 import { SpiceModal } from './components/SpiceModal';
 import { UserRankingList } from './components/UserRankingList';
 import { ComparisonModal } from './components/ComparisonModal';
 import { SpiceWheel } from './components/SpiceWheel';
+import { SpiceBlender } from './components/SpiceBlender';
 import { AuthModal } from './components/AuthModal';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
 import { MissingSpiceModal } from './components/MissingSpiceModal';
@@ -17,6 +18,7 @@ import { communityRatingService, CommunityRating } from './services/communityRat
 
 function App() {
   const { user, loading, signOut } = useAuth();
+  const [currentPage, setCurrentPage] = useState<'main' | 'blender'>('main');
   const [selectedSpice, setSelectedSpice] = useState<Spice | null>(null);
   const [spices, setSpices] = useState<Spice[]>([]);
   const [userRankings, setUserRankings] = useState<UserRanking[]>([]);
@@ -322,6 +324,16 @@ function App() {
     );
   }
 
+  // Show Spice Blender page
+  if (currentPage === 'blender') {
+    return (
+      <SpiceBlender 
+        spices={spices} 
+        onBack={() => setCurrentPage('main')} 
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
       {/* Header */}
@@ -368,6 +380,17 @@ function App() {
               excludeSpices={rankedSpiceIds}
               isLoggedIn={!!user}
             />
+          </div>
+          
+          {/* Navigation to Spice Blender */}
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => setCurrentPage('blender')}
+              className="flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg"
+            >
+              <Beaker className="w-5 h-5 mr-2" />
+              Try Spice Blender
+            </button>
           </div>
         </div>
       </div>
