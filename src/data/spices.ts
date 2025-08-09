@@ -275,5 +275,170 @@ export const spices: Spice[] = [
     description: 'Dehydrated garlic ground into a fine powder, offering concentrated flavor.',
     color: '#F5F5DC',
     icon: 'Sparkle'
+  },
+  {
+    id: '26',
+    name: 'Sumac',
+    origin: 'Middle East',
+    flavorProfile: ['Tart', 'Lemony', 'Fruity'],
+    commonUses: ['Middle Eastern cuisine', 'Salads', 'Grilled meats', 'Za\'atar blend'],
+    averageRating: 7.8,
+    description: 'A tangy, crimson spice with a bright lemony flavor that adds acidity without moisture.',
+    color: '#8B0000',
+    icon: 'Cherry'
+  },
+  {
+    id: '27',
+    name: 'Smoked Paprika',
+    origin: 'Spain',
+    flavorProfile: ['Smoky', 'Sweet', 'Earthy'],
+    commonUses: ['Spanish cuisine', 'Paella', 'Grilled vegetables', 'Meat rubs'],
+    averageRating: 8.9,
+    description: 'Spanish pimentón with an intense smoky flavor from oak-fired drying process.',
+    color: '#A0522D',
+    icon: 'Flame'
+  },
+  {
+    id: '28',
+    name: 'Cardamom (Black)',
+    origin: 'India',
+    flavorProfile: ['Smoky', 'Camphor', 'Resinous'],
+    commonUses: ['Indian curries', 'Rice dishes', 'Garam masala', 'Meat dishes'],
+    averageRating: 7.4,
+    description: 'Larger and more intense than green cardamom, with a bold smoky flavor.',
+    color: '#2F4F4F',
+    icon: 'Flower2'
+  },
+  {
+    id: '29',
+    name: 'Fenugreek',
+    origin: 'Mediterranean',
+    flavorProfile: ['Nutty', 'Sweet', 'Maple-like'],
+    commonUses: ['Indian cuisine', 'Curry powder', 'Bread', 'Pickles'],
+    averageRating: 6.9,
+    description: 'Small golden seeds with a distinctive maple syrup aroma and slightly bitter taste.',
+    color: '#DAA520',
+    icon: 'Wheat'
+  },
+  {
+    id: '30',
+    name: 'Nigella Seeds',
+    origin: 'Middle East',
+    flavorProfile: ['Nutty', 'Peppery', 'Onion-like'],
+    commonUses: ['Bread', 'Middle Eastern dishes', 'Indian cuisine', 'Pickles'],
+    averageRating: 7.1,
+    description: 'Small black seeds with a complex flavor reminiscent of onions, oregano, and black pepper.',
+    color: '#000000',
+    icon: 'Dot'
+  },
+  {
+    id: '31',
+    name: 'Asafoetida',
+    origin: 'Iran',
+    flavorProfile: ['Pungent', 'Onion-like', 'Garlic-like'],
+    commonUses: ['Indian cuisine', 'Lentil dishes', 'Vegetarian cooking', 'Digestive aid'],
+    averageRating: 6.2,
+    description: 'A resinous spice with an intense aroma that mellows to onion-garlic flavor when cooked.',
+    color: '#F4A460',
+    icon: 'Zap'
+  },
+  {
+    id: '32',
+    name: 'Juniper Berries',
+    origin: 'Northern Europe',
+    flavorProfile: ['Pine-like', 'Citrusy', 'Peppery'],
+    commonUses: ['Gin flavoring', 'Game meats', 'Sauerkraut', 'European cuisine'],
+    averageRating: 6.8,
+    description: 'Aromatic berries with a distinctive pine flavor, essential for gin and European cooking.',
+    color: '#4B0082',
+    icon: 'TreePine'
+  },
+  {
+    id: '33',
+    name: 'Long Pepper',
+    origin: 'India',
+    flavorProfile: ['Hot', 'Sweet', 'Nutmeg-like'],
+    commonUses: ['Ancient spice blends', 'Pickling', 'Meat dishes', 'Traditional medicine'],
+    averageRating: 7.3,
+    description: 'An ancient spice with complex heat and sweet undertones, predating black pepper in Europe.',
+    color: '#8B4513',
+    icon: 'Zap'
+  },
+  {
+    id: '34',
+    name: 'Grains of Paradise',
+    origin: 'West Africa',
+    flavorProfile: ['Peppery', 'Citrusy', 'Floral'],
+    commonUses: ['Craft beer', 'Gin', 'African cuisine', 'Spice blends'],
+    averageRating: 7.6,
+    description: 'Exotic seeds with a complex peppery heat and citrusy, floral notes.',
+    color: '#CD853F',
+    icon: 'Sparkles'
+  },
+  {
+    id: '35',
+    name: 'Mace',
+    origin: 'Indonesia',
+    flavorProfile: ['Warm', 'Sweet', 'Nutmeg-like'],
+    commonUses: ['Baking', 'Sauces', 'Indian cuisine', 'Pickling'],
+    averageRating: 7.7,
+    description: 'The delicate outer covering of nutmeg with a more refined, less intense flavor.',
+    color: '#FF8C00',
+    icon: 'Flower'
+  },
+  {
+    id: '36',
+    name: 'Aleppo Pepper',
+    origin: 'Syria',
+    flavorProfile: ['Fruity', 'Mild heat', 'Sweet'],
+    commonUses: ['Middle Eastern cuisine', 'Pizza', 'Salads', 'Meat dishes'],
+    averageRating: 8.1,
+    description: 'A moderately hot pepper with fruity undertones and a hint of cumin-like earthiness.',
+    color: '#DC143C',
+    icon: 'Flame'
+  },
+  {
+    id: '37',
+    name: 'Urfa Biber',
+    origin: 'Turkey',
+    flavorProfile: ['Smoky', 'Sweet', 'Raisin-like'],
+    commonUses: ['Turkish cuisine', 'Grilled meats', 'Vegetables', 'Chocolate desserts'],
+    averageRating: 8.3,
+    description: 'Turkish chili with deep, smoky flavor and sweet raisin-like notes from sun-drying.',
+    color: '#800080',
+    icon: 'Flame'
+  },
+  {
+    id: '38',
+    name: 'Pink Peppercorns',
+    origin: 'South America',
+    flavorProfile: ['Fruity', 'Sweet', 'Mild pepper'],
+    commonUses: ['French cuisine', 'Seafood', 'Salads', 'Desserts'],
+    averageRating: 7.9,
+    description: 'Not true pepper, these berries offer a sweet, fruity flavor with mild peppery heat.',
+    color: '#FFC0CB',
+    icon: 'Circle'
+  },
+  {
+    id: '39',
+    name: 'Szechuan Peppercorns',
+    origin: 'China',
+    flavorProfile: ['Numbing', 'Citrusy', 'Floral'],
+    commonUses: ['Chinese cuisine', 'Szechuan dishes', 'Five-spice powder', 'Stir-fries'],
+    averageRating: 7.5,
+    description: 'Unique spice that creates a tingling, numbing sensation with citrusy, floral notes.',
+    color: '#8B0000',
+    icon: 'Zap'
+  },
+  {
+    id: '40',
+    name: 'Annatto',
+    origin: 'Central America',
+    flavorProfile: ['Earthy', 'Peppery', 'Nutty'],
+    commonUses: ['Latin American cuisine', 'Food coloring', 'Achiote paste', 'Rice dishes'],
+    averageRating: 7.2,
+    description: 'Seeds that provide natural orange-red coloring and subtle earthy flavor to dishes.',
+    color: '#FF4500',
+    icon: 'Sun'
   }
 ];

@@ -109,5 +109,55 @@ export const spiceBlends: SpiceBlendInfo[] = [
     commonUses: ['Italian sausage', 'Meat dishes', 'Pasta sauces', 'Pizza toppings'],
     origin: 'Italian',
     color: '#8B4513'
+  },
+  {
+    id: 'za-atar',
+    name: 'Za\'atar',
+    description: 'A tangy Middle Eastern blend that combines the tartness of sumac with aromatic herbs and nutty sesame seeds. This versatile seasoning brings bright, herbaceous flavors with a distinctive lemony tang that enhances everything from flatbreads to roasted vegetables.',
+    ingredients: ['Sumac', 'Thyme', 'Oregano', 'Sesame Seeds', 'Salt'],
+    flavorProfile: ['Tangy', 'Herbal', 'Nutty', 'Lemony'],
+    commonUses: ['Flatbread', 'Olive oil dips', 'Roasted vegetables', 'Middle Eastern cuisine'],
+    origin: 'Middle Eastern',
+    color: '#8FBC8F'
+  },
+  {
+    id: 'garam-masala',
+    name: 'Garam Masala',
+    description: 'A warming Indian spice blend that translates to "hot spice mixture." This aromatic combination balances sweet cinnamon and cardamom with warming cloves and peppery notes, creating a complex seasoning that adds depth and warmth to curries and rice dishes.',
+    ingredients: ['Cinnamon', 'Cardamom', 'Cloves', 'Black Pepper', 'Cumin'],
+    flavorProfile: ['Warm', 'Sweet', 'Aromatic', 'Complex'],
+    commonUses: ['Indian curries', 'Rice dishes', 'Meat marinades', 'Vegetable dishes'],
+    origin: 'Indian',
+    color: '#CD853F'
+  },
+  {
+    id: 'berbere',
+    name: 'Berbere',
+    description: 'A fiery Ethiopian spice blend that forms the backbone of the country\'s cuisine. This complex mixture combines hot chilies with warm spices and aromatic herbs, creating a seasoning that delivers both heat and incredible depth of flavor with hints of sweetness and earthiness.',
+    ingredients: ['Chili Powder', 'Paprika', 'Ginger', 'Cardamom', 'Coriander'],
+    flavorProfile: ['Spicy', 'Complex', 'Earthy', 'Warm'],
+    commonUses: ['Ethiopian cuisine', 'Stews', 'Meat dishes', 'Lentil dishes'],
+    origin: 'Ethiopian',
+    color: '#B22222'
+  },
+  {
+    id: 'ras-el-hanout',
+    name: 'Ras el Hanout',
+    description: 'A luxurious Moroccan spice blend whose name means "head of the shop" - traditionally the spice merchant\'s finest mixture. This complex blend can contain dozens of spices, creating a warm, aromatic seasoning with floral notes, gentle heat, and exotic complexity perfect for tagines and couscous.',
+    ingredients: ['Cinnamon', 'Cumin', 'Coriander', 'Ginger', 'Turmeric'],
+    flavorProfile: ['Complex', 'Warm', 'Floral', 'Exotic'],
+    commonUses: ['Moroccan cuisine', 'Tagines', 'Couscous', 'Lamb dishes'],
+    origin: 'Moroccan',
+    color: '#DAA520'
+  },
+  {
+    id: 'dukkah',
+    name: 'Dukkah',
+    description: 'An Egyptian blend that combines toasted nuts, seeds, and spices into a crunchy, flavorful mixture. This textural seasoning offers nutty richness from hazelnuts, aromatic herbs, and warm spices, traditionally served with bread and olive oil or used as a coating for meats and vegetables.',
+    ingredients: ['Coriander', 'Cumin', 'Sesame Seeds', 'Hazelnuts', 'Thyme'],
+    flavorProfile: ['Nutty', 'Crunchy', 'Aromatic', 'Earthy'],
+    commonUses: ['Bread dipping', 'Meat coating', 'Salad topping', 'Egyptian cuisine'],
+    origin: 'Egyptian',
+    color: '#D2B48C'
   }
 ];
