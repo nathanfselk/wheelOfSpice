@@ -78,7 +78,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
                     onClick={() => handlePageChange('main')}
                     className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
                   >
-                    Wheel of Spice
+                   Spice Ranker
                   </button>
                 </div>
                 
@@ -157,7 +157,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
               onClick={() => onPageChange('main')}
               className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
             >
-              Wheel of Spice
+             Spice Ranker
             </button>
           </div>
 
