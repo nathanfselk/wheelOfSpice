@@ -91,11 +91,16 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices }) => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="mb-8">
+          <div className="mb-8" itemScope itemType="https://schema.org/WebApplication">
+            <meta itemProp="name" content="Custom Spice Blend Maker - Create Your Own Spice Blends" />
+            <meta itemProp="description" content="Create custom spice blends online with our interactive blend maker. Combine premium spices and get flavor profiles and recipe suggestions." />
             <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              Your Custom Blend
+              Custom Spice Blend Maker
             </h1>
-          </div>
+            <p className="text-gray-600 mt-1">Create custom spice blends with premium ingredients - Get flavor profiles and recipe ideas</p>
+            <div className="mt-2 text-sm text-gray-500">
+              <span>Custom spice blends • Gourmet seasonings • Recipe development • Flavor combinations</span>
+            </div>
 
           {/* Blend Summary */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">

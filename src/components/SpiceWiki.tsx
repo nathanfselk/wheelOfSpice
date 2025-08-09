@@ -35,11 +35,16 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-8" itemScope itemType="https://schema.org/WebPage">
+            <meta itemProp="name" content="Complete Spice Guide - Buy Premium Spices Online" />
+            <meta itemProp="description" content="Comprehensive guide to 25+ cooking spices and gourmet blends with flavor profiles, origins, and buying recommendations" />
             <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              Spice Wiki
+              Complete Spice Guide - Premium Cooking Spices
             </h1>
-            <p className="text-gray-600 mt-1">Explore our complete collection of spices and blends</p>
+            <p className="text-gray-600 mt-1">Expert guide to buying the best cooking spices online - 25+ premium spices with detailed reviews</p>
+            <div className="mt-2 text-sm text-gray-500">
+              <span>Gourmet spices • Flavor profiles • Origin information • Buying guides • Recipe suggestions</span>
+            </div>
           </div>
 
           {/* Search Bar */}

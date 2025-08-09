@@ -384,12 +384,15 @@ function App() {
       <div>
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2" itemProp="name">
               Spice Ranker
             </h1>
-            <h2 className="text-gray-600 text-lg font-medium">
-              Discover, learn, and rank your favorite spices
+            <h2 className="text-gray-600 text-lg font-medium" itemProp="description">
+              Find the best spices to buy online - Expert reviews and flavor guides
             </h2>
+            <div className="mt-4 text-sm text-gray-500">
+              <span itemProp="keywords">Premium cooking spices • Flavor profiles • Spice reviews • Buy quality spices online</span>
+            </div>
           </div>
           
           <div className="flex justify-center">
