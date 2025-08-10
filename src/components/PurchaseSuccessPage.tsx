@@ -76,6 +76,10 @@ export const PurchaseSuccessPage: React.FC<PurchaseSuccessPageProps> = ({ onBack
                   <span className="font-medium text-gray-900">$8.00</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-gray-600">Shipping:</span>
+                  <span className="font-medium text-gray-900">$5.99 - $12.99</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
                   <span className="font-medium text-green-600">Completed</span>
                 </div>

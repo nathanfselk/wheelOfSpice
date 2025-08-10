@@ -125,25 +125,50 @@ export const SpiceShop: React.FC = () => {
             <div className="p-6">
               <div className="space-y-4">
                 {orders.map((order) => (
-                  <div key={order.order_id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        Order #{order.order_id}
+                  <div key={order.order_id} className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          Order #{order.order_id}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(order.order_date).toLocaleDateString()}
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {new Date(order.order_date).toLocaleDateString()}
+                      <div className="text-right">
+                        <div className="font-bold text-gray-900">
+                          ${(order.amount_total / 100).toFixed(2)}
+                        </div>
+                        <div className={`text-sm font-medium ${
+                          order.order_status === 'completed' ? 'text-green-600' : 'text-yellow-600'
+                        }`}>
+                          {order.order_status.charAt(0).toUpperCase() + order.order_status.slice(1)}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-gray-900">
-                        ${(order.amount_total / 100).toFixed(2)}
+                    
+                    {/* Shipping Information */}
+                    {order.shipping_address && (
+                      <div className="border-t border-gray-200 pt-3">
+                        <div className="text-sm text-gray-600 mb-1">
+                          <strong>Shipping to:</strong> {order.shipping_name}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {order.shipping_address.line1}
+                          {order.shipping_address.line2 && `, ${order.shipping_address.line2}`}
+                          <br />
+                          {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postal_code}
+                        </div>
+                        {order.shipping_phone && (
+                          <div className="text-sm text-gray-600 mt-1">
+                            Phone: {order.shipping_phone}
+                          </div>
+                        )}
+                        <div className="text-sm text-gray-600 mt-1">
+                          Shipping: ${(order.shipping_cost / 100).toFixed(2)}
+                        </div>
                       </div>
-                      <div className={`text-sm font-medium ${
-                        order.order_status === 'completed' ? 'text-green-600' : 'text-yellow-600'
-                      }`}>
-                        {order.order_status.charAt(0).toUpperCase() + order.order_status.slice(1)}
-                      </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>

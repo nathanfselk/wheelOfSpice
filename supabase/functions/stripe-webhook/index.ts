@@ -98,7 +98,12 @@ async function handleEvent(event: Stripe.Event) {
           amount_subtotal,
           amount_total,
           currency,
+          shipping_details,
+          total_details,
         } = stripeData as Stripe.Checkout.Session;
+
+        // Get shipping cost from total_details
+        const shipping_cost = total_details?.amount_shipping || 0;
 
         // Insert the order into the stripe_orders table
         const { error: orderError } = await supabase.from('stripe_orders').insert({
@@ -110,6 +115,10 @@ async function handleEvent(event: Stripe.Event) {
           currency,
           payment_status,
           status: 'completed', // assuming we want to mark it as completed since payment is successful
+          shipping_address: shipping_details?.address ? JSON.stringify(shipping_details.address) : null,
+          shipping_name: shipping_details?.name || null,
+          shipping_phone: shipping_details?.phone || null,
+          shipping_cost: shipping_cost,
         });
 
         if (orderError) {

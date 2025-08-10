@@ -22,6 +22,10 @@ export interface StripeOrder {
   payment_status: string;
   order_status: string;
   order_date: string;
+  shipping_address: any;
+  shipping_name: string | null;
+  shipping_phone: string | null;
+  shipping_cost: number;
 }
 
 export class StripeService {

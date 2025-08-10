@@ -106,7 +106,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             ${product.price.toFixed(2)}
           </div>
           <div className="text-sm text-gray-600">
-            {product.mode === 'subscription' ? 'per month' : 'one-time'}
+            {product.mode === 'subscription' ? 'per month' : '+ shipping'}
+          </div>
+        </div>
+
+        {/* Shipping Info */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="text-sm text-blue-700">
+            <div className="font-medium mb-1">Shipping Options:</div>
+            <div>• Standard (3-7 days): $5.99</div>
+            <div>• Express (1-2 days): $12.99</div>
+            <div className="mt-1 text-xs">US addresses only</div>
           </div>
         </div>
 
