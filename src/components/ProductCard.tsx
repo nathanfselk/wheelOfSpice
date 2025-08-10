@@ -25,6 +25,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [addingToCart, setAddingToCart] = useState(false);
 
   const handlePurchase = async () => {
+  };
   const handleAddToCart = () => {
     setAddingToCart(true);
     onAddToCart(product, spice);
@@ -91,17 +92,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{error}</p>
-          </div>
+        <button
+          className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center ${
             addingToCart
-
+              ? 'bg-green-500 text-white'
               : cartQuantity > 0
                 ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105'
                 : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
+          }`}
           onClick={handleAddToCart}
           disabled={addingToCart}
+        >
           {addingToCart ? (
             <>
               <Check className="w-4 h-4 mr-2" />
