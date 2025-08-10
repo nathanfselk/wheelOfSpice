@@ -8,7 +8,6 @@ import { spices } from '../data/spices';
 
 export const SpiceShop: React.FC = () => {
   const { user } = useAuth();
-  const [purchasedProducts, setPurchasedProducts] = useState<Set<string>>(new Set());
   const [orders, setOrders] = useState<StripeOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,16 +22,6 @@ export const SpiceShop: React.FC = () => {
         // Load user's orders
         const userOrders = await stripeService.getUserOrders();
         setOrders(userOrders);
-
-        // Check which products have been purchased
-        const purchased = new Set<string>();
-        for (const product of stripeProducts) {
-          const hasPurchased = await stripeService.hasUserPurchasedProduct(product.priceId);
-          if (hasPurchased) {
-            purchased.add(product.id);
-          }
-        }
-        setPurchasedProducts(purchased);
       } catch (error) {
         console.error('Error loading purchase data:', error);
       } finally {
@@ -49,15 +38,6 @@ export const SpiceShop: React.FC = () => {
       const loadPurchaseData = async () => {
         const userOrders = await stripeService.getUserOrders();
         setOrders(userOrders);
-
-        const purchased = new Set<string>();
-        for (const product of stripeProducts) {
-          const hasPurchased = await stripeService.hasUserPurchasedProduct(product.priceId);
-          if (hasPurchased) {
-            purchased.add(product.id);
-          }
-        }
-        setPurchasedProducts(purchased);
       };
       loadPurchaseData();
     }
@@ -105,7 +85,6 @@ export const SpiceShop: React.FC = () => {
                   origin: spice.origin,
                   flavorProfile: spice.flavorProfile
                 } : undefined}
-                isPurchased={purchasedProducts.has(product.id)}
                 onPurchaseSuccess={handlePurchaseSuccess}
               />
             );
