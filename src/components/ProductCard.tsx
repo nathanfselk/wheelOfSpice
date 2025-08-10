@@ -104,7 +104,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             ${product.price.toFixed(2)}
           </div>
           <div className="text-sm text-gray-600">
-            {product.mode === 'subscription'}
+            {product.mode === 'subscription' ? 'per month' : '+ shipping'}
           </div>
         </div>
 
