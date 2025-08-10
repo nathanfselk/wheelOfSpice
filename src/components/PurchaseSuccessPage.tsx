@@ -15,13 +15,11 @@ export const PurchaseSuccessPage: React.FC<PurchaseSuccessPageProps> = ({ onBack
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('product');
+    const purchaseType = urlParams.get('purchase');
+    const itemCount = urlParams.get('items');
     
-    if (productId) {
-      const product = getProductById(productId);
-      if (product) {
-        setProductName(product.name);
-      }
+    if (purchaseType === 'success') {
+      setProductName(itemCount ? `${itemCount} item${itemCount !== '1' ? 's' : ''}` : 'Your order');
     }
     
     setLoading(false);
@@ -68,20 +66,16 @@ export const PurchaseSuccessPage: React.FC<PurchaseSuccessPageProps> = ({ onBack
                 <div className="flex justify-between">
                   <span className="text-gray-600">Product:</span>
                   <span className="font-medium text-gray-900">
-                    {productName || 'Premium Spice'}
+                    {productName || 'Premium Spices'}
                   </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Amount:</span>
-                  <span className="font-medium text-gray-900">$8.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping:</span>
-                  <span className="font-medium text-gray-900">$5.99 - $12.99</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
                   <span className="font-medium text-green-600">Completed</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Shipping:</span>
+                  <span className="font-medium text-gray-900">$5.99 - $12.99</span>
                 </div>
               </div>
             </div>

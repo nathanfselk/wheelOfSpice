@@ -1,5 +1,10 @@
 import { supabase } from '../lib/supabase';
 
+export interface CartLineItem {
+  price: string;
+  quantity: number;
+}
+
 export interface StripeSubscription {
   customer_id: string;
   subscription_id: string | null;
@@ -70,6 +75,50 @@ export class StripeService {
       return { sessionId: result.sessionId, url: result.url };
     } catch (error: any) {
       console.error('Error creating checkout session:', error);
+      return { error: error.message || 'Failed to create checkout session' };
+    }
+  }
+
+  /**
+   * Create a Stripe checkout session for multiple cart items
+   */
+  async createCartCheckoutSession(
+    lineItems: CartLineItem[],
+    successUrl: string,
+    cancelUrl: string
+  ): Promise<{ sessionId?: string; url?: string; error?: string }> {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        return { error: 'Authentication required' };
+      }
+
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: successUrl,
+          cancel_url: cancelUrl
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { error: result.error || 'Failed to create checkout session' };
+      }
+
+      return { sessionId: result.sessionId, url: result.url };
+    } catch (error: any) {
+      console.error('Error creating cart checkout session:', error);
       return { error: error.message || 'Failed to create checkout session' };
     }
   }

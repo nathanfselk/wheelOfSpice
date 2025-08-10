@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Loader2 } from 'lucide-react';
+import { ShoppingCart, Loader2, Plus, Check } from 'lucide-react';
 import { StripeProduct } from '../stripe-config';
-import { stripeService } from '../services/stripeService';
 import { SpiceIcon } from './SpiceIcon';
 
 interface ProductCardProps {
@@ -13,43 +12,27 @@ interface ProductCardProps {
     origin: string;
     flavorProfile: string[];
   };
-  onPurchaseSuccess?: () => void;
+  onAddToCart: (product: StripeProduct, spice?: any) => void;
+  cartQuantity: number;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   spice,
-  onPurchaseSuccess
+  onAddToCart,
+  cartQuantity
 }) => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [addingToCart, setAddingToCart] = useState(false);
 
   const handlePurchase = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const successUrl = `${window.location.origin}/purchase-success?product=${product.id}`;
-      const cancelUrl = window.location.href;
-
-      const result = await stripeService.createCheckoutSession(
-        product.priceId,
-        product.mode,
-        successUrl,
-        cancelUrl
-      );
-
-      if (result.error) {
-        setError(result.error);
-      } else if (result.url) {
-        // Redirect to Stripe checkout
-        window.location.href = result.url;
-      }
-    } catch (error: any) {
-      setError(error.message || 'Failed to start checkout');
-    } finally {
-      setLoading(false);
-    }
+  const handleAddToCart = () => {
+    setAddingToCart(true);
+    onAddToCart(product, spice);
+    
+    // Show brief success animation
+    setTimeout(() => {
+      setAddingToCart(false);
+    }, 500);
   };
 
   return (
@@ -112,26 +95,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-600 text-sm">{error}</p>
           </div>
-        )}
+            addingToCart
 
-        <button
-          onClick={handlePurchase}
-          disabled={loading}
-          className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center ${
-            loading
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
-          }`}
-        >
-          {loading ? (
+              : cartQuantity > 0
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105'
+                : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
+          onClick={handleAddToCart}
+          disabled={addingToCart}
+          {addingToCart ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Processing...
+              <Check className="w-4 h-4 mr-2" />
+              Added!
+            </>
+          ) : cartQuantity > 0 ? (
+            <>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Another ({cartQuantity} in cart)
             </>
           ) : (
             <>
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Buy Now
+              Add to Cart
             </>
           )}
         </button>

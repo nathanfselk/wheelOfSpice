@@ -43,20 +43,44 @@ Deno.serve(async (req) => {
       return corsResponse({ error: 'Method not allowed' }, 405);
     }
 
-    const { price_id, success_url, cancel_url, mode } = await req.json();
+    const requestBody = await req.json();
+    const { price_id, line_items, success_url, cancel_url, mode } = requestBody;
 
-    const error = validateParameters(
-      { price_id, success_url, cancel_url, mode },
-      {
-        cancel_url: 'string',
-        price_id: 'string',
-        success_url: 'string',
-        mode: { values: ['payment', 'subscription'] },
-      },
-    );
+    // Validate required parameters
+    if (!success_url || typeof success_url !== 'string') {
+      return corsResponse({ error: 'Missing required parameter success_url' }, 400);
+    }
+    if (!cancel_url || typeof cancel_url !== 'string') {
+      return corsResponse({ error: 'Missing required parameter cancel_url' }, 400);
+    }
+    if (!mode || !['payment', 'subscription'].includes(mode)) {
+      return corsResponse({ error: 'Invalid mode parameter' }, 400);
+    }
 
-    if (error) {
-      return corsResponse({ error }, 400);
+    // Validate line items (for cart checkout) or price_id (for single item)
+    let checkoutLineItems;
+    if (line_items && Array.isArray(line_items)) {
+      // Cart checkout with multiple items
+      if (line_items.length === 0) {
+        return corsResponse({ error: 'Cart cannot be empty' }, 400);
+      }
+      
+      // Validate each line item
+      for (const item of line_items) {
+        if (!item.price || typeof item.price !== 'string') {
+          return corsResponse({ error: 'Invalid price in line items' }, 400);
+        }
+        if (!item.quantity || typeof item.quantity !== 'number' || item.quantity < 1) {
+          return corsResponse({ error: 'Invalid quantity in line items' }, 400);
+        }
+      }
+      
+      checkoutLineItems = line_items;
+    } else if (price_id && typeof price_id === 'string') {
+      // Single item checkout
+      checkoutLineItems = [{ price: price_id, quantity: 1 }];
+    } else {
+      return corsResponse({ error: 'Either price_id or line_items must be provided' }, 400);
     }
 
     const authHeader = req.headers.get('Authorization')!;
@@ -226,12 +250,7 @@ Deno.serve(async (req) => {
           },
         },
       ],
-      line_items: [
-        {
-          price: price_id,
-          quantity: 1,
-        },
-      ],
+      line_items: checkoutLineItems,
       mode,
       success_url,
       cancel_url,
@@ -248,28 +267,3 @@ Deno.serve(async (req) => {
     return corsResponse({ error: error.message }, 500);
   }
 });
-
-type ExpectedType = 'string' | { values: string[] };
-type Expectations<T> = { [K in keyof T]: ExpectedType };
-
-function validateParameters<T extends Record<string, any>>(values: T, expected: Expectations<T>): string | undefined {
-  for (const parameter in values) {
-    const expectation = expected[parameter];
-    const value = values[parameter];
-
-    if (expectation === 'string') {
-      if (value == null) {
-        return `Missing required parameter ${parameter}`;
-      }
-      if (typeof value !== 'string') {
-        return `Expected parameter ${parameter} to be a string got ${JSON.stringify(value)}`;
-      }
-    } else {
-      if (!expectation.values.includes(value)) {
-        return `Expected parameter ${parameter} to be one of ${expectation.values.join(', ')}`;
-      }
-    }
-  }
-
-  return undefined;
-}

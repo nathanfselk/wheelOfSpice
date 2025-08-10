@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Star, Package } from 'lucide-react';
+import { ShoppingBag, Star, Package, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useCart } from '../hooks/useCart';
 import { stripeProducts } from '../stripe-config';
 import { stripeService, StripeOrder } from '../services/stripeService';
 import { ProductCard } from './ProductCard';
+import { CartModal } from './CartModal';
 import { spices } from '../data/spices';
 
 export const SpiceShop: React.FC = () => {
   const { user } = useAuth();
+  const { cart, addToCart, removeFromCart, updateQuantity, clearCart, getItemQuantity } = useCart();
   const [orders, setOrders] = useState<StripeOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
     const loadPurchaseData = async () => {
@@ -32,8 +36,23 @@ export const SpiceShop: React.FC = () => {
     loadPurchaseData();
   }, [user]);
 
-  const handlePurchaseSuccess = () => {
-    // Reload purchase data after successful purchase
+  const handleAddToCart = (product: any, spice?: any) => {
+    addToCart({
+      productId: product.id,
+      priceId: product.priceId,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      spice: spice ? {
+        color: spice.color,
+        icon: spice.icon,
+        origin: spice.origin
+      } : undefined
+    });
+  };
+
+  const handleCartSuccess = () => {
+    // Reload order data after successful purchase
     if (user) {
       const loadPurchaseData = async () => {
         const userOrders = await stripeService.getUserOrders();
@@ -70,6 +89,34 @@ export const SpiceShop: React.FC = () => {
           </div>
         </div>
 
+        {/* Cart Button - Fixed Position */}
+        {cart.totalItems > 0 && (
+          <div className="fixed bottom-6 right-6 z-40">
+            <button
+              onClick={() => setShowCart(true)}
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full p-4 shadow-2xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-110 flex items-center"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              <div className="ml-2 bg-white bg-opacity-20 rounded-full px-2 py-1 text-sm font-bold">
+                {cart.totalItems}
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* Cart Modal */}
+        <CartModal
+          isOpen={showCart}
+          onClose={() => setShowCart(false)}
+          cartItems={cart.items}
+          totalPrice={cart.totalPrice}
+          totalItems={cart.totalItems}
+          onUpdateQuantity={updateQuantity}
+          onRemoveItem={removeFromCart}
+          onClearCart={clearCart}
+          user={user}
+        />
+
         {/* Products Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {stripeProducts.map((product) => {
@@ -85,7 +132,8 @@ export const SpiceShop: React.FC = () => {
                   origin: spice.origin,
                   flavorProfile: spice.flavorProfile
                 } : undefined}
-                onPurchaseSuccess={handlePurchaseSuccess}
+                onAddToCart={handleAddToCart}
+                cartQuantity={getItemQuantity(product.id)}
               />
             );
           })}

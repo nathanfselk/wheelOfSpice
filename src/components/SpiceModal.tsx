@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { X, MapPin, Palette, ChefHat, Star, Trash2, ShoppingCart } from 'lucide-react';
+import { X, MapPin, Palette, ChefHat, Star, Trash2, ShoppingCart, Plus } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { RankingSlider } from './RankingSlider';
 import { SpiceIcon } from './SpiceIcon';
 import { CommunityRating } from '../services/communityRatingService';
 import { stripeProducts } from '../stripe-config';
-import { stripeService } from '../services/stripeService';
 
 interface SpiceModalProps {
   spice: Spice;
@@ -14,6 +13,8 @@ interface SpiceModalProps {
   onDelete?: (spice: Spice) => void;
   initialRating?: number;
   communityRating?: CommunityRating;
+  onAddToCart?: (product: any, spice: any) => void;
+  cartQuantity?: number;
 }
 
 export const SpiceModal: React.FC<SpiceModalProps> = ({
@@ -22,11 +23,12 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
   onRank,
   onDelete,
   initialRating,
-  communityRating
+  communityRating,
+  onAddToCart,
+  cartQuantity = 0
 }) => {
   const [currentRating, setCurrentRating] = useState(initialRating || 5);
-  const [purchaseLoading, setPurchaseLoading] = useState(false);
-  const [purchaseError, setPurchaseError] = useState('');
+  const [addingToCart, setAddingToCart] = useState(false);
 
   // Find corresponding product for this spice
   const product = stripeProducts.find(p => p.name === spice.name);
@@ -42,33 +44,15 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
     }
   };
 
-  const handlePurchase = async () => {
-    if (!product) return;
-
-    setPurchaseLoading(true);
-    setPurchaseError('');
-
-    try {
-      const successUrl = `${window.location.origin}?product=${product.id}`;
-      const cancelUrl = window.location.href;
-
-      const result = await stripeService.createCheckoutSession(
-        product.priceId,
-        product.mode,
-        successUrl,
-        cancelUrl
-      );
-
-      if (result.error) {
-        setPurchaseError(result.error);
-      } else if (result.url) {
-        window.location.href = result.url;
-      }
-    } catch (error: any) {
-      setPurchaseError(error.message || 'Failed to start checkout');
-    } finally {
-      setPurchaseLoading(false);
-    }
+  const handleAddToCart = () => {
+    if (!product || !onAddToCart) return;
+    
+    setAddingToCart(true);
+    onAddToCart(product, spice);
+    
+    setTimeout(() => {
+      setAddingToCart(false);
+    }, 500);
   };
 
   return (
@@ -155,10 +139,10 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
           </div>
 
           {/* Purchase Section */}
-          {product && (
+          {product && onAddToCart && (
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
-                Buy Premium {spice.name}
+                Add to Cart
               </h3>
               
               <div className="text-center mb-4">
@@ -168,32 +152,38 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
                 <div className="text-sm text-gray-600">
                   High-quality {spice.name.toLowerCase()} from {spice.origin}
                 </div>
+                {cartQuantity > 0 && (
+                  <div className="text-sm text-blue-600 font-medium mt-1">
+                    {cartQuantity} in cart
+                  </div>
+                )}
               </div>
 
-              {purchaseError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 text-sm">{purchaseError}</p>
-                </div>
-              )}
-
               <button
-                onClick={handlePurchase}
-                disabled={purchaseLoading}
+                onClick={handleAddToCart}
+                disabled={addingToCart}
                 className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center ${
-                  purchaseLoading
+                  addingToCart
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transform hover:scale-105'
+                    : cartQuantity > 0
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105'
+                      : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transform hover:scale-105'
                 }`}
               >
-                {purchaseLoading ? (
+                {addingToCart ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Processing...
+                    Adding...
+                  </>
+                ) : cartQuantity > 0 ? (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Another
                   </>
                 ) : (
                   <>
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    Buy Now
+                    Add to Cart
                   </>
                 )}
               </button>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { LogOut, User } from 'lucide-react';
 import { Spice, UserRanking } from './types/spice';
+import { useCart } from './hooks/useCart';
 import { SpiceSearchDropdown } from './components/SpiceSearchDropdown';
 import { SpiceModal } from './components/SpiceModal';
 import { UserRankingList } from './components/UserRankingList';
@@ -23,6 +24,7 @@ import { communityRatingService, CommunityRating } from './services/communityRat
 
 function App() {
   const { user, loading, signOut } = useAuth();
+  const { addToCart, getItemQuantity } = useCart();
   const [currentPage, setCurrentPage] = useState<'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success'>('main');
   const [selectedSpice, setSelectedSpice] = useState<Spice | null>(null);
   const [spices, setSpices] = useState<Spice[]>([]);
@@ -307,6 +309,21 @@ function App() {
     setShowMissingSpiceModal(true);
   };
 
+  const handleAddToCart = (product: any, spice: any) => {
+    addToCart({
+      productId: product.id,
+      priceId: product.priceId,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      spice: spice ? {
+        color: spice.color,
+        icon: spice.icon,
+        origin: spice.origin
+      } : undefined
+    });
+  };
+
   const handleSignOut = async () => {
     await signOut();
   };
@@ -498,6 +515,8 @@ function App() {
           onDelete={handleDeleteRating}
           initialRating={editingRanking?.rating}
           communityRating={communityRatings[selectedSpice.id]}
+          onAddToCart={handleAddToCart}
+          cartQuantity={getItemQuantity(selectedSpice.id)}
         />
       )}
 
