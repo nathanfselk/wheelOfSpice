@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { X, MapPin, Palette, ChefHat, Star, Trash2 } from 'lucide-react';
+import { X, MapPin, Palette, ChefHat, Star, Trash2, ShoppingCart } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { RankingSlider } from './RankingSlider';
 import { SpiceIcon } from './SpiceIcon';
 import { CommunityRating } from '../services/communityRatingService';
+import { stripeProducts } from '../stripe-config';
+import { stripeService } from '../services/stripeService';
 
 interface SpiceModalProps {
   spice: Spice;
@@ -23,7 +25,11 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
   communityRating
 }) => {
   const [currentRating, setCurrentRating] = useState(initialRating || 5);
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
+  const [purchaseError, setPurchaseError] = useState('');
 
+  // Find corresponding product for this spice
+  const product = stripeProducts.find(p => p.name === spice.name);
   const handleRank = () => {
     onRank(spice, currentRating);
     onClose();
@@ -35,6 +41,36 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
       onClose();
     }
   };
+
+  const handlePurchase = async () => {
+    if (!product) return;
+
+    setPurchaseLoading(true);
+    setPurchaseError('');
+
+    try {
+      const successUrl = `${window.location.origin}?product=${product.id}`;
+      const cancelUrl = window.location.href;
+
+      const result = await stripeService.createCheckoutSession(
+        product.priceId,
+        product.mode,
+        successUrl,
+        cancelUrl
+      );
+
+      if (result.error) {
+        setPurchaseError(result.error);
+      } else if (result.url) {
+        window.location.href = result.url;
+      }
+    } catch (error: any) {
+      setPurchaseError(error.message || 'Failed to start checkout');
+    } finally {
+      setPurchaseLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -117,6 +153,52 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
               </button>
             )}
           </div>
+
+          {/* Purchase Section */}
+          {product && (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
+                Buy Premium {spice.name}
+              </h3>
+              
+              <div className="text-center mb-4">
+                <div className="text-2xl font-bold text-gray-900">
+                  ${product.price.toFixed(2)}
+                </div>
+                <div className="text-sm text-gray-600">
+                  High-quality {spice.name.toLowerCase()} from {spice.origin}
+                </div>
+              </div>
+
+              {purchaseError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{purchaseError}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handlePurchase}
+                disabled={purchaseLoading}
+                className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center ${
+                  purchaseLoading
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transform hover:scale-105'
+                }`}
+              >
+                {purchaseLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Buy Now
+                  </>
+                )}
+              </button>
+            </div>
+          )}
 
           {/* Details Grid */}
           <div className="grid md:grid-cols-3 gap-6">

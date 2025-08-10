@@ -10,6 +10,8 @@ import { SpiceWheel } from './components/SpiceWheel';
 import { SpiceBlender } from './components/SpiceBlender';
 import { SpiceWiki } from './components/SpiceWiki';
 import { AuthModal } from './components/AuthModal';
+import { SpiceShop } from './components/SpiceShop';
+import { PurchaseSuccessPage } from './components/PurchaseSuccessPage';
 import { GlobalHeader } from './components/GlobalHeader';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
 import { MissingSpiceModal } from './components/MissingSpiceModal';
@@ -21,7 +23,7 @@ import { communityRatingService, CommunityRating } from './services/communityRat
 
 function App() {
   const { user, loading, signOut } = useAuth();
-  const [currentPage, setCurrentPage] = useState<'main' | 'blender' | 'wiki'>('main');
+  const [currentPage, setCurrentPage] = useState<'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success'>('main');
   const [selectedSpice, setSelectedSpice] = useState<Spice | null>(null);
   const [spices, setSpices] = useState<Spice[]>([]);
   const [userRankings, setUserRankings] = useState<UserRanking[]>([]);
@@ -36,6 +38,14 @@ function App() {
     currentIndex: number;
   } | null>(null);
   const [loadingRankings, setLoadingRankings] = useState(false);
+
+  // Check for purchase success page on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('product')) {
+      setCurrentPage('purchase-success');
+    }
+  }, []);
 
   // Initialize spices on component mount
   useEffect(() => {
@@ -327,6 +337,34 @@ function App() {
     );
   }
 
+  // Show Purchase Success page
+  if (currentPage === 'purchase-success') {
+    return <PurchaseSuccessPage onBackToApp={() => setCurrentPage('main')} />;
+  }
+
+  // Show Spice Shop page
+  if (currentPage === 'shop') {
+    return (
+      <>
+        <GlobalHeader 
+          currentPage={currentPage} 
+          onPageChange={setCurrentPage}
+          user={user}
+          onAuthClick={() => setShowAuthModal(true)}
+          onSignOut={handleSignOut}
+        />
+        <SpiceShop />
+        
+        {/* Auth Modal */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
+      </>
+    );
+  }
+
   // Show Spice Blender page
   if (currentPage === 'blender') {
     return (
@@ -339,6 +377,7 @@ function App() {
           onSignOut={handleSignOut}
         />
         <SpiceBlender spices={spices} />
+        <SpiceBlender spices={spices} user={user} />
       </>
     );
   }

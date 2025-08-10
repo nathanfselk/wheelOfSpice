@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Star, Beaker, Book, User, LogOut } from 'lucide-react';
+import { Menu, X, Star, Beaker, Book, User, LogOut, ShoppingBag } from 'lucide-react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface GlobalHeaderProps {
-  currentPage: 'main' | 'blender' | 'wiki';
-  onPageChange: (page: 'main' | 'blender' | 'wiki') => void;
+  currentPage: 'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success';
+  onPageChange: (page: 'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success') => void;
   user: SupabaseUser | null;
   onAuthClick: () => void;
   onSignOut: () => void;
@@ -33,10 +33,11 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
   const menuItems = [
     { id: 'main', label: 'Spice Ranker', icon: Star },
     { id: 'blender', label: 'Blend Maker', icon: Beaker },
-    { id: 'wiki', label: 'Spice Wiki', icon: Book }
+    { id: 'wiki', label: 'Spice Wiki', icon: Book },
+    { id: 'shop', label: 'Spice Shop', icon: ShoppingBag }
   ];
 
-  const handlePageChange = (page: 'main' | 'blender' | 'wiki') => {
+  const handlePageChange = (page: 'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success') => {
     onPageChange(page);
     setIsMobileMenuOpen(false);
   };
@@ -90,7 +91,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
                     return (
                       <button
                         key={item.id}
-                        onClick={() => handlePageChange(item.id as 'main' | 'blender' | 'wiki')}
+                        onClick={() => handlePageChange(item.id as 'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success')}
                         className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${
                           isActive
                             ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
@@ -171,7 +172,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
                 return (
                   <button
                     key={item.id}
-                    onClick={() => handlePageChange(item.id as 'main' | 'blender' | 'wiki')}
+                    onClick={() => handlePageChange(item.id as 'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success')}
                     className={`flex items-center px-4 py-2 rounded-lg transition-all ${
                       isActive
                         ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
