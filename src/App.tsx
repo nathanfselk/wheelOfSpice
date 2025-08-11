@@ -12,10 +12,12 @@ import { SpiceBlender } from './components/SpiceBlender';
 import { SpiceWiki } from './components/SpiceWiki';
 import { AuthModal } from './components/AuthModal';
 import { SpiceShop } from './components/SpiceShop';
+import { ShoppingCart } from 'lucide-react';
 import { PurchaseSuccessPage } from './components/PurchaseSuccessPage';
 import { GlobalHeader } from './components/GlobalHeader';
 import { EmailVerificationBanner } from './components/EmailVerificationBanner';
 import { MissingSpiceModal } from './components/MissingSpiceModal';
+import { CartModal } from './components/CartModal';
 import { useAuth } from './hooks/useAuth';
 import { spices as staticSpices } from './data/spices';
 import { spiceBlends } from './data/spiceBlends';
@@ -25,7 +27,7 @@ import { isPurchasingEnabled } from './config/features';
 
 function App() {
   const { user, loading, signOut } = useAuth();
-  const { addToCart, getItemQuantity } = useCart();
+  const { cart, addToCart, removeFromCart, updateQuantity, clearCart, getItemQuantity } = useCart();
   const [currentPage, setCurrentPage] = useState<'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success'>('main');
   const [selectedSpice, setSelectedSpice] = useState<Spice | null>(null);
   const [spices, setSpices] = useState<Spice[]>([]);
@@ -41,6 +43,7 @@ function App() {
     currentIndex: number;
   } | null>(null);
   const [loadingRankings, setLoadingRankings] = useState(false);
+  const [showCart, setShowCart] = useState(false);
 
   // Check for purchase success page on mount
   useEffect(() => {
@@ -496,6 +499,21 @@ function App() {
           getItemQuantity={getItemQuantity}
         />
         
+        {/* Persistent Cart Icon */}
+        {isPurchasingEnabled() && cart.totalItems > 0 && (
+          <div className="fixed bottom-6 right-6 z-40">
+            <button
+              onClick={() => setShowCart(true)}
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full p-4 shadow-2xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-110 flex items-center"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              <div className="ml-2 bg-white bg-opacity-20 rounded-full px-2 py-1 text-sm font-bold">
+                {cart.totalItems}
+              </div>
+            </button>
+          </div>
+        )}
+
         {/* Sign up prompt for anonymous users */}
         {!user && (
           <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl shadow-lg p-6 text-center mt-8">
@@ -553,6 +571,21 @@ function App() {
         onClose={() => setShowMissingSpiceModal(false)}
         userId={user?.id}
       />
+
+      {/* Cart Modal */}
+      {isPurchasingEnabled() && (
+        <CartModal
+          isOpen={showCart}
+          onClose={() => setShowCart(false)}
+          cartItems={cart.items}
+          totalPrice={cart.totalPrice}
+          totalItems={cart.totalItems}
+          onUpdateQuantity={updateQuantity}
+          onRemoveItem={removeFromCart}
+          onClearCart={clearCart}
+          user={user}
+        />
+      )}
     </div>
     </>
   );
