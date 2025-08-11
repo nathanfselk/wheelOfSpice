@@ -6,10 +6,10 @@ export interface FeatureFlags {
 }
 
 export const featureFlags: FeatureFlags = {
-  enablePurchasing: true, // Set to true to enable purchasing features
-  enableCart: true,
-  enableStripeCheckout: true,
-  enableShippingAddresses: true
+  enablePurchasing: false, // Set to true to enable purchasing features
+  enableCart: false,
+  enableStripeCheckout: false,
+  enableShippingAddresses: false
 };
 
 // Helper function to check if purchasing is enabled
