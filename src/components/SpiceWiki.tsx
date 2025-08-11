@@ -97,8 +97,8 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
               >
                 <option value="name-asc">Name (A-Z)</option>
                 <option value="name-desc">Name (Z-A)</option>
-                <option value="rating-high">Community Rating ↑ </option>
-                <option value="rating-low">Community Rating ↓ </option>
+                <option value="rating-high">Community Rating ( ↑ )</option>
+                <option value="rating-low">Community Rating ( ↓ )</option>
               </select>
             </div>
           </div>
