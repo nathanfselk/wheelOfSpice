@@ -407,7 +407,7 @@ export const spices: Spice[] = [
     description: 'Seeds that provide natural orange-red coloring and subtle earthy flavor to dishes.',
     color: '#FF4500',
     icon: 'Sun'
-  }
+  },
   {
     id: '38',
     name: 'Asafoetida',
