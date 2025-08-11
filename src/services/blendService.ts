@@ -88,7 +88,11 @@ export class BlendService {
       'Onion Powder': ['Seasoning blends', 'Meat rubs', 'Soups', 'Roasted vegetables'],
       'Dill': ['Pickles', 'Fish dishes', 'Potato salad', 'Scandinavian cuisine'],
       'Red Pepper Flakes': ['Pizza', 'Pasta', 'Italian cuisine', 'Spice blends'],
-      'Thai Chili': ['Thai cuisine', 'Asian stir-fries', 'Hot sauces', 'Curry pastes']
+      'Thai Chili': ['Thai cuisine', 'Asian stir-fries', 'Hot sauces', 'Curry pastes'],
+      'Asafoetida': ['Indian cuisine', 'Lentil dishes', 'Vegetarian cooking', 'Digestive aid'],
+      'Long Pepper': ['Ancient Roman cuisine', 'Indian pickles', 'Spice blends', 'Medicinal preparations'],
+      'Grains of Paradise': ['Medieval European cuisine', 'Gin flavoring', 'Spice blends', 'Meat seasoning'],
+      'Pink Peppercorns': ['French cuisine', 'Seafood', 'Salads', 'Desserts']
     };
 
     return spiceUsesMap[spiceName] || ['Seasoning', 'Cooking', 'Flavoring'];

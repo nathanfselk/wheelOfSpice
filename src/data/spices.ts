@@ -408,4 +408,48 @@ export const spices: Spice[] = [
     color: '#FF4500',
     icon: 'Sun'
   }
+  {
+    id: '38',
+    name: 'Asafoetida',
+    origin: 'Iran',
+    flavorProfile: ['Pungent', 'Onion-like', 'Sulfurous'],
+    commonUses: ['Indian cuisine', 'Lentil dishes', 'Vegetarian cooking', 'Digestive aid'],
+    averageRating: 6.2,
+    description: 'A resinous spice with an intense aroma that mellows into onion-garlic flavors when cooked.',
+    color: '#8B4513',
+    icon: 'Zap'
+  },
+  {
+    id: '39',
+    name: 'Long Pepper',
+    origin: 'India',
+    flavorProfile: ['Hot', 'Sweet', 'Nutmeg-like'],
+    commonUses: ['Ancient Roman cuisine', 'Indian pickles', 'Spice blends', 'Medicinal preparations'],
+    averageRating: 7.1,
+    description: 'An ancient spice that predates black pepper, with complex heat and sweet undertones.',
+    color: '#2F4F4F',
+    icon: 'Minus'
+  },
+  {
+    id: '40',
+    name: 'Grains of Paradise',
+    origin: 'West Africa',
+    flavorProfile: ['Peppery', 'Citrusy', 'Cardamom-like'],
+    commonUses: ['Medieval European cuisine', 'Gin flavoring', 'Spice blends', 'Meat seasoning'],
+    averageRating: 7.3,
+    description: 'Also known as melegueta pepper, these seeds offer complex peppery heat with citrus notes.',
+    color: '#CD853F',
+    icon: 'Sparkles'
+  },
+  {
+    id: '41',
+    name: 'Pink Peppercorns',
+    origin: 'South America',
+    flavorProfile: ['Fruity', 'Sweet', 'Mild heat'],
+    commonUses: ['French cuisine', 'Seafood', 'Salads', 'Desserts'],
+    averageRating: 7.8,
+    description: 'Not true peppercorns but dried berries with a sweet, fruity flavor and mild peppery heat.',
+    color: '#FFB6C1',
+    icon: 'Cherry'
+  }
 ];
