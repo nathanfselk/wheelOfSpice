@@ -98,15 +98,6 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
               <meta itemProp="priceCurrency" content="USD" />
             </div>
             <p className="text-gray-700 text-lg leading-relaxed">{spice.description}</p>
-            
-            {/* SEO-optimized buying information */}
-            <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
-              <h4 className="font-semibold text-green-800 mb-2">Where to Buy {spice.name}</h4>
-              <p className="text-green-700 text-sm">
-                Find premium {spice.name.toLowerCase()} at specialty spice shops, gourmet food stores, or online retailers. 
-                Look for {spice.origin} origin for authentic flavor. Best stored in airtight containers away from light and heat.
-              </p>
-            </div>
           </div>
 
           {/* Rating Section - Moved up */}
