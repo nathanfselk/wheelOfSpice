@@ -7,6 +7,7 @@ import { stripeService, StripeOrder } from '../services/stripeService';
 import { ProductCard } from './ProductCard';
 import { CartModal } from './CartModal';
 import { spices } from '../data/spices';
+import { isPurchasingEnabled } from '../config/features';
 
 export const SpiceShop: React.FC = () => {
   const { user } = useAuth();
@@ -14,6 +15,19 @@ export const SpiceShop: React.FC = () => {
   const [orders, setOrders] = useState<StripeOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCart, setShowCart] = useState(false);
+
+  // Redirect if purchasing is disabled
+  if (!isPurchasingEnabled()) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-600 mb-2">Shop Coming Soon</h2>
+          <p className="text-gray-500">The spice shop is currently under development. Check back soon!</p>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     const loadPurchaseData = async () => {

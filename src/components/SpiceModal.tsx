@@ -5,6 +5,7 @@ import { RankingSlider } from './RankingSlider';
 import { SpiceIcon } from './SpiceIcon';
 import { CommunityRating } from '../services/communityRatingService';
 import { stripeProducts } from '../stripe-config';
+import { isPurchasingEnabled } from '../config/features';
 
 interface SpiceModalProps {
   spice: Spice;
@@ -139,7 +140,7 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
           </div>
 
           {/* Purchase Section */}
-          {product && onAddToCart && (
+          {isPurchasingEnabled() && product && onAddToCart && (
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
                 Add to Cart

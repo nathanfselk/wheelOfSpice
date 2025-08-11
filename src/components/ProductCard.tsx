@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShoppingCart, Loader2, Plus, Check } from 'lucide-react';
 import { StripeProduct } from '../stripe-config';
 import { SpiceIcon } from './SpiceIcon';
+import { isPurchasingEnabled } from '../config/features';
 
 interface ProductCardProps {
   product: StripeProduct;
@@ -24,9 +25,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const [addingToCart, setAddingToCart] = useState(false);
 
-  const handlePurchase = async () => {
-  };
   const handleAddToCart = () => {
+    if (!isPurchasingEnabled()) return;
+    
     setAddingToCart(true);
     onAddToCart(product, spice);
     
@@ -83,6 +84,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Product Footer */}
       <div className="p-6">
+        {!isPurchasingEnabled() && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
+            <p className="text-gray-600 text-sm text-center">
+              Purchasing temporarily disabled
+            </p>
+          </div>
+        )}
+        
         <div className="flex items-center justify-between mb-4">
           <div className="text-2xl font-bold text-gray-900">
             ${product.price.toFixed(2)}
@@ -93,17 +102,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         <button
+          disabled={!isPurchasingEnabled()}
           className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center ${
-            addingToCart
+            !isPurchasingEnabled()
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : addingToCart
               ? 'bg-green-500 text-white'
               : cartQuantity > 0
                 ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transform hover:scale-105'
                 : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
           }`}
           onClick={handleAddToCart}
-          disabled={addingToCart}
+          disabled={addingToCart || !isPurchasingEnabled()}
         >
-          {addingToCart ? (
+          {!isPurchasingEnabled() ? (
+            'Coming Soon'
+          ) : addingToCart ? (
             <>
               <Check className="w-4 h-4 mr-2" />
               Added!

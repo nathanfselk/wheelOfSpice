@@ -3,6 +3,7 @@ import { Menu, X, Star, Beaker, Book, User, LogOut, ShoppingBag, ShoppingCart } 
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { useCart } from '../hooks/useCart';
 import { CartModal } from './CartModal';
+import { isPurchasingEnabled } from '../config/features';
 
 interface GlobalHeaderProps {
   currentPage: 'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success';
@@ -34,12 +35,15 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const menuItems = [
+  const baseMenuItems = [
     { id: 'main', label: 'Spice Ranker', icon: Star },
     { id: 'blender', label: 'Blend Maker', icon: Beaker },
-    { id: 'wiki', label: 'Spice Wiki', icon: Book },
-    { id: 'shop', label: 'Spice Shop', icon: ShoppingBag }
+    { id: 'wiki', label: 'Spice Wiki', icon: Book }
   ];
+
+  const menuItems = isPurchasingEnabled() 
+    ? [...baseMenuItems, { id: 'shop', label: 'Spice Shop', icon: ShoppingBag }]
+    : baseMenuItems;
 
   const handlePageChange = (page: 'main' | 'blender' | 'wiki' | 'shop' | 'purchase-success') => {
     onPageChange(page);
@@ -146,17 +150,19 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
         )}
 
         {/* Cart Modal */}
-        <CartModal
-          isOpen={showCart}
-          onClose={() => setShowCart(false)}
-          cartItems={cart.items}
-          totalPrice={cart.totalPrice}
-          totalItems={cart.totalItems}
-          onUpdateQuantity={updateQuantity}
-          onRemoveItem={removeFromCart}
-          onClearCart={clearCart}
-          user={user}
-        />
+        {isPurchasingEnabled() && (
+          <CartModal
+            isOpen={showCart}
+            onClose={() => setShowCart(false)}
+            cartItems={cart.items}
+            totalPrice={cart.totalPrice}
+            totalItems={cart.totalItems}
+            onUpdateQuantity={updateQuantity}
+            onRemoveItem={removeFromCart}
+            onClearCart={clearCart}
+            user={user}
+          />
+        )}
       </>
     );
   }
@@ -206,7 +212,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
             {user ? (
               <div className="flex items-center space-x-3">
                 {/* Cart Button */}
-                {cart.totalItems > 0 && (
+                {isPurchasingEnabled() && cart.totalItems > 0 && (
                   <button
                     onClick={() => setShowCart(true)}
                     className="relative flex items-center px-3 py-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors text-sm"

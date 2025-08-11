@@ -21,6 +21,7 @@ import { spices as staticSpices } from './data/spices';
 import { spiceBlends } from './data/spiceBlends';
 import { userRankingService } from './services/userRankingService';
 import { communityRatingService, CommunityRating } from './services/communityRatingService';
+import { isPurchasingEnabled } from './config/features';
 
 function App() {
   const { user, loading, signOut } = useAuth();
@@ -310,6 +311,8 @@ function App() {
   };
 
   const handleAddToCart = (product: any, spice: any) => {
+    if (!isPurchasingEnabled()) return;
+    
     addToCart({
       productId: product.id,
       priceId: product.priceId,
@@ -355,12 +358,12 @@ function App() {
   }
 
   // Show Purchase Success page
-  if (currentPage === 'purchase-success') {
+  if (currentPage === 'purchase-success' && isPurchasingEnabled()) {
     return <PurchaseSuccessPage onBackToApp={() => setCurrentPage('main')} />;
   }
 
   // Show Spice Shop page
-  if (currentPage === 'shop') {
+  if (currentPage === 'shop' && isPurchasingEnabled()) {
     return (
       <>
         <GlobalHeader 
