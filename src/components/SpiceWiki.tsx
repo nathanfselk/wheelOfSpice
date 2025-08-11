@@ -1,27 +1,51 @@
 import React, { useState } from 'react';
-import { Search, Book, Beaker, MapPin, Palette, ChefHat } from 'lucide-react';
+import { Search, Book, Beaker, MapPin, Palette, ChefHat, ArrowUpDown, Star } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { SpiceBlendInfo } from '../data/spiceBlends';
 import { SpiceIcon } from './SpiceIcon';
 import { SpiceModal } from './SpiceModal';
+import { CommunityRating } from '../services/communityRatingService';
 
 interface SpiceWikiProps {
   spices: Spice[];
   spiceBlends: SpiceBlendInfo[];
   onSpiceRank?: (spice: Spice, rating: number) => void;
+  communityRatings?: Record<string, CommunityRating>;
 }
 
-export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpiceRank }) => {
+type SortOption = 'name-asc' | 'name-desc' | 'rating-high' | 'rating-low';
+
+export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpiceRank, communityRatings = {} }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'spices' | 'blends'>('spices');
+  const [sortOption, setSortOption] = useState<SortOption>('name-asc');
   const [selectedSpice, setSelectedSpice] = useState<Spice | null>(null);
   const [selectedBlend, setSelectedBlend] = useState<SpiceBlendInfo | null>(null);
 
-  const filteredSpices = spices.filter(spice =>
-    spice.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    spice.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    spice.flavorProfile.some(flavor => flavor.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredAndSortedSpices = spices
+    .filter(spice =>
+      spice.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      spice.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      spice.flavorProfile.some(flavor => flavor.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      switch (sortOption) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'rating-high':
+          const ratingA = communityRatings[a.id]?.average_rating || 0;
+          const ratingB = communityRatings[b.id]?.average_rating || 0;
+          return ratingB - ratingA;
+        case 'rating-low':
+          const ratingALow = communityRatings[a.id]?.average_rating || 0;
+          const ratingBLow = communityRatings[b.id]?.average_rating || 0;
+          return ratingALow - ratingBLow;
+        default:
+          return 0;
+      }
+    });
 
   const filteredBlends = spiceBlends.filter(blend =>
     blend.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -48,7 +72,7 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
           </div>
 
           {/* Search Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 space-y-4">
             <div className="relative max-w-md mx-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -58,6 +82,24 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
               />
+            </div>
+            
+            {/* Sort Options */}
+            <div className="flex items-center justify-center space-x-4">
+              <div className="flex items-center">
+                <ArrowUpDown className="w-4 h-4 text-gray-500 mr-2" />
+                <span className="text-sm font-medium text-gray-700">Sort by:</span>
+              </div>
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value as SortOption)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm"
+              >
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="rating-high">Community Rating (High to Low)</option>
+                <option value="rating-low">Community Rating (Low to High)</option>
+              </select>
             </div>
           </div>
 
@@ -73,7 +115,7 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
                 }`}
               >
                 <Book className="w-5 h-5 mr-2" />
-                Spices ({filteredSpices.length})
+                Spices ({filteredAndSortedSpices.length})
               </button>
               <button
                 onClick={() => setActiveTab('blends')}
@@ -91,7 +133,7 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
             {/* Spices Tab */}
             {activeTab === 'spices' && (
               <div className="p-6">
-                {filteredSpices.length === 0 ? (
+                {filteredAndSortedSpices.length === 0 ? (
                   <div className="text-center py-12">
                     <Book className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-600 mb-2">No spices found</h3>
@@ -99,7 +141,10 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
                   </div>
                 ) : (
                   <div className="grid gap-6">
-                    {filteredSpices.map((spice) => (
+                    {filteredAndSortedSpices.map((spice) => {
+                      const communityRating = communityRatings[spice.id];
+                      
+                      return (
                       <div 
                         key={spice.id} 
                         className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors cursor-pointer"
@@ -118,6 +163,20 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
                           </div>
                           <div className="flex-1">
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">{spice.name}</h3>
+                            
+                            {/* Community Rating Display */}
+                            {communityRating && (
+                              <div className="flex items-center mb-2">
+                                <Star className="w-4 h-4 text-yellow-500 mr-1 fill-current" />
+                                <span className="text-sm font-medium text-gray-700">
+                                  {communityRating.average_rating.toFixed(1)}/10
+                                </span>
+                                <span className="text-xs text-gray-500 ml-2">
+                                  ({communityRating.total_ratings} rating{communityRating.total_ratings !== 1 ? 's' : ''})
+                                </span>
+                              </div>
+                            )}
+                            
                             <p className="text-gray-700 text-lg leading-relaxed mb-4">{spice.description}</p>
                             
                             <div className="grid md:grid-cols-3 gap-4">
@@ -172,7 +231,7 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 )}
               </div>

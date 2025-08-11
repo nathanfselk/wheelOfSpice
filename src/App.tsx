@@ -416,6 +416,7 @@ function App() {
         <SpiceWiki 
           spices={spices} 
           spiceBlends={spiceBlends}
+          communityRatings={communityRatings}
           onSpiceRank={handleSpiceRank}
         />
         
