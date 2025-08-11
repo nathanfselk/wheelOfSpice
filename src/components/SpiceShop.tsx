@@ -217,16 +217,6 @@ export const SpiceShop: React.FC = () => {
           </div>
         )}
 
-        {/* Login Prompt for Anonymous Users */}
-        {!user && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-6 text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <ShoppingBag className="w-6 h-6 text-blue-500" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Sign In to Purchase</h3>
-            <p className="text-gray-600 mb-4">Create an account or sign in to buy premium spices and track your orders</p>
-          </div>
-        )}
       </div>
     </div>
   );

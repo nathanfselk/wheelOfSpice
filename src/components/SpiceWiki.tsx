@@ -1,26 +1,38 @@
 import React, { useState } from 'react';
-import { Search, Book, Beaker, MapPin, Palette, ChefHat, ArrowUpDown, Star } from 'lucide-react';
+import { Search, Book, Beaker, MapPin, Palette, ChefHat, ArrowUpDown, Star, ShoppingCart } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { SpiceBlendInfo } from '../data/spiceBlends';
 import { SpiceIcon } from './SpiceIcon';
 import { SpiceModal } from './SpiceModal';
 import { CommunityRating } from '../services/communityRatingService';
+import { isPurchasingEnabled } from '../config/features';
+import { stripeProducts } from '../stripe-config';
 
 interface SpiceWikiProps {
   spices: Spice[];
   spiceBlends: SpiceBlendInfo[];
   onSpiceRank?: (spice: Spice, rating: number) => void;
   communityRatings?: Record<string, CommunityRating>;
+  onAddToCart?: (product: any, spice: any) => void;
+  getItemQuantity?: (productId: string) => number;
 }
 
 type SortOption = 'name-asc' | 'name-desc' | 'rating-high' | 'rating-low';
 
-export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpiceRank, communityRatings = {} }) => {
+export const SpiceWiki: React.FC<SpiceWikiProps> = ({ 
+  spices, 
+  spiceBlends, 
+  onSpiceRank, 
+  communityRatings = {},
+  onAddToCart,
+  getItemQuantity
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'spices' | 'blends'>('spices');
   const [sortOption, setSortOption] = useState<SortOption>('name-asc');
   const [selectedSpice, setSelectedSpice] = useState<Spice | null>(null);
   const [selectedBlend, setSelectedBlend] = useState<SpiceBlendInfo | null>(null);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
 
   const filteredAndSortedSpices = spices
     .filter(spice =>
@@ -53,6 +65,22 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
     blend.ingredients.some(ingredient => ingredient.toLowerCase().includes(searchTerm.toLowerCase())) ||
     blend.flavorProfile.some(flavor => flavor.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const handleAddToCart = (spice: Spice, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the spice click
+    
+    if (!onAddToCart || !isPurchasingEnabled()) return;
+    
+    const product = stripeProducts.find(p => p.name === spice.name);
+    if (!product) return;
+    
+    setAddingToCart(spice.id);
+    onAddToCart(product, spice);
+    
+    setTimeout(() => {
+      setAddingToCart(null);
+    }, 500);
+  };
 
   return (
     <>
@@ -150,7 +178,29 @@ export const SpiceWiki: React.FC<SpiceWikiProps> = ({ spices, spiceBlends, onSpi
                         className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors cursor-pointer"
                         onClick={() => setSelectedSpice(spice)}
                       >
-                        <div className="flex items-start mb-4">
+                        <div className="flex items-start mb-4 relative">
+                          {/* Cart Icon - Upper Right */}
+                          {isPurchasingEnabled() && onAddToCart && stripeProducts.find(p => p.name === spice.name) && (
+                            <button
+                              onClick={(e) => handleAddToCart(spice, e)}
+                              disabled={addingToCart === spice.id}
+                              className={`absolute top-0 right-0 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+                                addingToCart === spice.id
+                                  ? 'bg-green-500 text-white'
+                                  : getItemQuantity && getItemQuantity(spice.id) > 0
+                                    ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-orange-100 hover:text-orange-600'
+                              }`}
+                              title={addingToCart === spice.id ? 'Adding...' : 'Add to cart'}
+                            >
+                              {addingToCart === spice.id ? (
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <ShoppingCart className="w-5 h-5" />
+                              )}
+                            </button>
+                          )}
+                          
                           <div
                             className="w-16 h-16 rounded-full border-4 border-white shadow-lg mr-6 flex items-center justify-center flex-shrink-0"
                             style={{ backgroundColor: spice.color }}

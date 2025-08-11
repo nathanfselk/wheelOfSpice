@@ -418,6 +418,8 @@ function App() {
           spiceBlends={spiceBlends}
           communityRatings={communityRatings}
           onSpiceRank={handleSpiceRank}
+          onAddToCart={handleAddToCart}
+          getItemQuantity={getItemQuantity}
         />
         
         {/* Auth Modal */}
@@ -490,6 +492,8 @@ function App() {
           rankings={userRankings}
           onSpiceClick={handleRankingClick}
           onRankingReorder={handleRankingReorder}
+          onAddToCart={handleAddToCart}
+          getItemQuantity={getItemQuantity}
         />
         
         {/* Sign up prompt for anonymous users */}

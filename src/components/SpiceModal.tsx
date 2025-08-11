@@ -80,7 +80,33 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
               />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">{spice.name}</h2>
+              <div className="flex items-center space-x-3">
+                <h2 className="text-3xl font-bold text-gray-900">{spice.name}</h2>
+                {/* Cart Icon */}
+                {isPurchasingEnabled() && product && onAddToCart && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart();
+                    }}
+                    disabled={addingToCart}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+                      addingToCart
+                        ? 'bg-green-500 text-white'
+                        : cartQuantity > 0
+                          ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                          : 'bg-gray-100 text-gray-600 hover:bg-orange-100 hover:text-orange-600'
+                    }`}
+                    title={addingToCart ? 'Adding...' : 'Add to cart'}
+                  >
+                    {addingToCart ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <ShoppingCart className="w-5 h-5" />
+                    )}
+                  </button>
+                )}
+              </div>
               <p className="text-gray-600 mt-1">{spice.origin}</p>
             </div>
           </div>

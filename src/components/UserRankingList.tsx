@@ -1,22 +1,29 @@
 import React from 'react';
 import { useState } from 'react';
-import { Trophy, Medal, Award, Star } from 'lucide-react';
+import { Trophy, Medal, Award, Star, ShoppingCart } from 'lucide-react';
 import { UserRanking } from '../types/spice';
 import { SpiceIcon } from './SpiceIcon';
+import { isPurchasingEnabled } from '../config/features';
+import { stripeProducts } from '../stripe-config';
 
 interface UserRankingListProps {
   rankings: UserRanking[];
   onSpiceClick: (ranking: UserRanking) => void;
   onRankingReorder: (spiceId: string, newRating: number) => void;
+  onAddToCart?: (product: any, spice: any) => void;
+  getItemQuantity?: (productId: string) => number;
 }
 
 export const UserRankingList: React.FC<UserRankingListProps> = ({
   rankings,
   onSpiceClick,
-  onRankingReorder
+  onRankingReorder,
+  onAddToCart,
+  getItemQuantity
 }) => {
   const [draggedItem, setDraggedItem] = useState<UserRanking | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
 
   const getScoreColor = (rating: number) => {
     // Normalize rating from 1-10 scale to 0-1 scale
@@ -129,6 +136,22 @@ export const UserRankingList: React.FC<UserRankingListProps> = ({
     setDragOverIndex(null);
   };
 
+  const handleAddToCart = (ranking: UserRanking, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the ranking click
+    
+    if (!onAddToCart || !isPurchasingEnabled()) return;
+    
+    const product = stripeProducts.find(p => p.name === ranking.spice.name);
+    if (!product) return;
+    
+    setAddingToCart(ranking.spice.id);
+    onAddToCart(product, ranking.spice);
+    
+    setTimeout(() => {
+      setAddingToCart(null);
+    }, 500);
+  };
+
   const getRankIcon = (index: number) => {
     switch (index) {
       case 0:
@@ -205,7 +228,29 @@ export const UserRankingList: React.FC<UserRankingListProps> = ({
                   <h4 className="text-lg font-semibold text-gray-900 group-hover:text-orange-600 transition-colors pointer-events-none">
                     {ranking.spice.name}
                   </h4>
-                  <div className="flex items-center">
+                  <div className="flex items-center space-x-3">
+                    {/* Cart Icon */}
+                    {isPurchasingEnabled() && onAddToCart && stripeProducts.find(p => p.name === ranking.spice.name) && (
+                      <button
+                        onClick={(e) => handleAddToCart(ranking, e)}
+                        disabled={addingToCart === ranking.spice.id}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                          addingToCart === ranking.spice.id
+                            ? 'bg-green-500 text-white'
+                            : getItemQuantity && getItemQuantity(ranking.spice.id) > 0
+                              ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                              : 'bg-gray-100 text-gray-600 hover:bg-orange-100 hover:text-orange-600'
+                        }`}
+                        title={addingToCart === ranking.spice.id ? 'Adding...' : 'Add to cart'}
+                      >
+                        {addingToCart === ranking.spice.id ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <ShoppingCart className="w-4 h-4" />
+                        )}
+                      </button>
+                    )}
+                    
                     <Star className="w-4 h-4 text-yellow-500 mr-1 fill-current" />
                     <span className={`font-bold text-lg ${getScoreColor(ranking.rating)}`}>
                       {ranking.rating.toFixed(1)}/10
