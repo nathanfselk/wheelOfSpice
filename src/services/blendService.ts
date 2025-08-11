@@ -82,7 +82,13 @@ export class BlendService {
       'Sage': ['Poultry seasoning', 'Pasta', 'Sauces', 'Thanksgiving dishes'],
       'Vanilla': ['Baking', 'Desserts', 'Ice cream', 'Perfumes'],
       'Cayenne Pepper': ['Hot sauce', 'Cajun cuisine', 'Spice blends', 'Medicine'],
-      'Garlic Powder': ['Seasoning blends', 'Meat rubs', 'Roasted vegetables', 'Pasta']
+      'Garlic Powder': ['Seasoning blends', 'Meat rubs', 'Roasted vegetables', 'Pasta'],
+      'Parsley': ['Garnish', 'Salads', 'Soups', 'Mediterranean cuisine'],
+      'Cilantro': ['Mexican cuisine', 'Asian dishes', 'Salsa', 'Garnish'],
+      'Onion Powder': ['Seasoning blends', 'Meat rubs', 'Soups', 'Roasted vegetables'],
+      'Dill': ['Pickles', 'Fish dishes', 'Potato salad', 'Scandinavian cuisine'],
+      'Red Pepper Flakes': ['Pizza', 'Pasta', 'Italian cuisine', 'Spice blends'],
+      'Thai Chili': ['Thai cuisine', 'Asian stir-fries', 'Hot sauces', 'Curry pastes']
     };
 
     return spiceUsesMap[spiceName] || ['Seasoning', 'Cooking', 'Flavoring'];

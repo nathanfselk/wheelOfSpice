@@ -289,94 +289,72 @@ export const spices: Spice[] = [
   },
   {
     id: '27',
-    name: 'Smoked Paprika',
-    origin: 'Spain',
-    flavorProfile: ['Smoky', 'Sweet', 'Earthy'],
-    commonUses: ['Spanish cuisine', 'Paella', 'Grilled vegetables', 'Meat rubs'],
-    averageRating: 8.9,
-    description: 'Spanish pimentón with an intense smoky flavor from oak-fired drying process.',
-    color: '#A0522D',
-    icon: 'Flame'
+    name: 'Parsley',
+    origin: 'Mediterranean',
+    flavorProfile: ['Fresh', 'Grassy', 'Clean'],
+    commonUses: ['Garnish', 'Salads', 'Soups', 'Mediterranean cuisine'],
+    averageRating: 7.2,
+    description: 'A bright, fresh herb that adds color and clean flavor to dishes.',
+    color: '#228B22',
+    icon: 'Leaf'
   },
   {
     id: '28',
-    name: 'Cardamom (Black)',
-    origin: 'India',
-    flavorProfile: ['Smoky', 'Camphor', 'Resinous'],
-    commonUses: ['Indian curries', 'Rice dishes', 'Garam masala', 'Meat dishes'],
-    averageRating: 7.4,
-    description: 'Larger and more intense than green cardamom, with a bold smoky flavor.',
-    color: '#2F4F4F',
-    icon: 'Flower2'
+    name: 'Cilantro',
+    origin: 'Mediterranean',
+    flavorProfile: ['Citrusy', 'Fresh', 'Bright'],
+    commonUses: ['Mexican cuisine', 'Asian dishes', 'Salsa', 'Garnish'],
+    averageRating: 6.8,
+    description: 'A polarizing herb with bright, citrusy flavor that people either love or hate.',
+    color: '#32CD32',
+    icon: 'Leaf'
   },
   {
     id: '29',
-    name: 'Fenugreek',
-    origin: 'Mediterranean',
-    flavorProfile: ['Nutty', 'Sweet', 'Maple-like'],
-    commonUses: ['Indian cuisine', 'Curry powder', 'Bread', 'Pickles'],
-    averageRating: 6.9,
-    description: 'Small golden seeds with a distinctive maple syrup aroma and slightly bitter taste.',
-    color: '#DAA520',
-    icon: 'Wheat'
+    name: 'Onion Powder',
+    origin: 'Central Asia',
+    flavorProfile: ['Savory', 'Sweet', 'Pungent'],
+    commonUses: ['Seasoning blends', 'Meat rubs', 'Soups', 'Roasted vegetables'],
+    averageRating: 8.1,
+    description: 'Dehydrated onions ground into powder, providing concentrated onion flavor without moisture.',
+    color: '#F5DEB3',
+    icon: 'Circle'
   },
   {
     id: '30',
-    name: 'Nigella Seeds',
-    origin: 'Middle East',
-    flavorProfile: ['Nutty', 'Peppery', 'Onion-like'],
-    commonUses: ['Bread', 'Middle Eastern dishes', 'Indian cuisine', 'Pickles'],
-    averageRating: 7.1,
-    description: 'Small black seeds with a complex flavor reminiscent of onions, oregano, and black pepper.',
-    color: '#000000',
-    icon: 'Dot'
+    name: 'Dill',
+    origin: 'Mediterranean',
+    flavorProfile: ['Fresh', 'Tangy', 'Grassy'],
+    commonUses: ['Pickles', 'Fish dishes', 'Potato salad', 'Scandinavian cuisine'],
+    averageRating: 7.3,
+    description: 'A delicate herb with feathery leaves and a distinctive tangy, grassy flavor.',
+    color: '#9ACD32',
+    icon: 'Sprout'
   },
   {
     id: '31',
-    name: 'Asafoetida',
-    origin: 'Iran',
-    flavorProfile: ['Pungent', 'Onion-like', 'Garlic-like'],
-    commonUses: ['Indian cuisine', 'Lentil dishes', 'Vegetarian cooking', 'Digestive aid'],
-    averageRating: 6.2,
-    description: 'A resinous spice with an intense aroma that mellows to onion-garlic flavor when cooked.',
-    color: '#F4A460',
-    icon: 'Zap'
+    name: 'Red Pepper Flakes',
+    origin: 'Mediterranean',
+    flavorProfile: ['Hot', 'Fruity', 'Sharp'],
+    commonUses: ['Pizza', 'Pasta', 'Italian cuisine', 'Spice blends'],
+    averageRating: 8.0,
+    description: 'Crushed dried red peppers that add heat and flavor to dishes.',
+    color: '#DC143C',
+    icon: 'Flame'
   },
   {
     id: '32',
-    name: 'Juniper Berries',
-    origin: 'Northern Europe',
-    flavorProfile: ['Pine-like', 'Citrusy', 'Peppery'],
-    commonUses: ['Gin flavoring', 'Game meats', 'Sauerkraut', 'European cuisine'],
-    averageRating: 6.8,
-    description: 'Aromatic berries with a distinctive pine flavor, essential for gin and European cooking.',
-    color: '#4B0082',
-    icon: 'TreePine'
+    name: 'Thai Chili',
+    origin: 'Thailand',
+    flavorProfile: ['Very Hot', 'Fruity', 'Intense'],
+    commonUses: ['Thai cuisine', 'Asian stir-fries', 'Hot sauces', 'Curry pastes'],
+    averageRating: 7.5,
+    description: 'Small but extremely hot chilies that pack intense heat with fruity undertones.',
+    color: '#FF4500',
+    icon: 'Flame'
   },
   {
     id: '33',
-    name: 'Long Pepper',
-    origin: 'India',
-    flavorProfile: ['Hot', 'Sweet', 'Nutmeg-like'],
-    commonUses: ['Ancient spice blends', 'Pickling', 'Meat dishes', 'Traditional medicine'],
-    averageRating: 7.3,
-    description: 'An ancient spice with complex heat and sweet undertones, predating black pepper in Europe.',
-    color: '#8B4513',
-    icon: 'Zap'
-  },
-  {
-    id: '34',
-    name: 'Grains of Paradise',
-    origin: 'West Africa',
-    flavorProfile: ['Peppery', 'Citrusy', 'Floral'],
-    commonUses: ['Craft beer', 'Gin', 'African cuisine', 'Spice blends'],
-    averageRating: 7.6,
-    description: 'Exotic seeds with a complex peppery heat and citrusy, floral notes.',
-    color: '#CD853F',
-    icon: 'Sparkles'
-  },
-  {
-    id: '35',
     name: 'Mace',
     origin: 'Indonesia',
     flavorProfile: ['Warm', 'Sweet', 'Nutmeg-like'],
@@ -387,7 +365,7 @@ export const spices: Spice[] = [
     icon: 'Flower'
   },
   {
-    id: '36',
+    id: '34',
     name: 'Aleppo Pepper',
     origin: 'Syria',
     flavorProfile: ['Fruity', 'Mild heat', 'Sweet'],
@@ -398,7 +376,7 @@ export const spices: Spice[] = [
     icon: 'Flame'
   },
   {
-    id: '37',
+    id: '35',
     name: 'Urfa Biber',
     origin: 'Turkey',
     flavorProfile: ['Smoky', 'Sweet', 'Raisin-like'],
@@ -409,18 +387,7 @@ export const spices: Spice[] = [
     icon: 'Flame'
   },
   {
-    id: '38',
-    name: 'Pink Peppercorns',
-    origin: 'South America',
-    flavorProfile: ['Fruity', 'Sweet', 'Mild pepper'],
-    commonUses: ['French cuisine', 'Seafood', 'Salads', 'Desserts'],
-    averageRating: 7.9,
-    description: 'Not true pepper, these berries offer a sweet, fruity flavor with mild peppery heat.',
-    color: '#FFC0CB',
-    icon: 'Circle'
-  },
-  {
-    id: '39',
+    id: '36',
     name: 'Szechuan Peppercorns',
     origin: 'China',
     flavorProfile: ['Numbing', 'Citrusy', 'Floral'],
@@ -431,7 +398,7 @@ export const spices: Spice[] = [
     icon: 'Zap'
   },
   {
-    id: '40',
+    id: '37',
     name: 'Annatto',
     origin: 'Central America',
     flavorProfile: ['Earthy', 'Peppery', 'Nutty'],
