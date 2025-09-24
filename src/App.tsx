@@ -378,12 +378,6 @@ function App() {
         />
         <SpiceShop />
         
-        {/* Auth Modal */}
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onAuthSuccess={handleAuthSuccess}
-        />
       </>
     );
   }
@@ -400,6 +394,13 @@ function App() {
           onSignOut={handleSignOut}
         />
         <SpiceBlender spices={spices} user={user} />
+        
+        {/* Auth Modal */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
       </>
     );
   }
@@ -422,13 +423,6 @@ function App() {
           onSpiceRank={handleSpiceRank}
           onAddToCart={handleAddToCart}
           getItemQuantity={getItemQuantity}
-        />
-        
-        {/* Auth Modal */}
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onAuthSuccess={handleAuthSuccess}
         />
       </>
     );
@@ -586,6 +580,13 @@ function App() {
         />
       )}
     </div>
+    
+    {/* Global Auth Modal - Available on all pages */}
+    <AuthModal
+      isOpen={showAuthModal}
+      onClose={() => setShowAuthModal(false)}
+      onAuthSuccess={handleAuthSuccess}
+    />
     </>
   );
 }
