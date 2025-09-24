@@ -401,7 +401,6 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, user }) => {
               </div>
             )}
           </div>
-        </div>
       </div>
     );
   }
