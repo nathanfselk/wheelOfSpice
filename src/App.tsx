@@ -585,7 +585,6 @@ function App() {
           onClearCart={clearCart}
           user={user}
         />
-      )}
     </div>
     </>
   );
