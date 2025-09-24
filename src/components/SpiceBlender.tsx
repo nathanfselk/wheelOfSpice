@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, X, Beaker, ChefHat, Sparkles, Save, Trash2, Edit3, Clock } from 'lucide-react';
-import { useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { Spice } from '../types/spice';
 import { BlendSpice, BlendSummary, UserBlend } from '../types/blend';
@@ -168,156 +167,156 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, user }) => {
     setBlendName('');
   };
 
+  // If blend summary exists, show the results page
   if (blendSummary) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Blend Builder - Main Column */}
+            {/* Blend Summary - Main Column */}
             <div className="lg:col-span-2">
-          {/* Blend Summary */}
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            {/* Blend Header */}
-            <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-4">
-              <h2 className="text-2xl font-bold text-white">{blendName}</h2>
-              <p className="text-purple-100">Your custom spice blend is ready!</p>
-            </div>
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                {/* Blend Header */}
+                <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-4">
+                  <h2 className="text-2xl font-bold text-white">{blendName}</h2>
+                  <p className="text-purple-100">Your custom spice blend is ready!</p>
+                </div>
 
-            <div className="p-6 space-y-6">
-              {/* Blend Composition */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <Beaker className="w-5 h-5 mr-2 text-purple-600" />
-                  Blend Composition
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {selectedSpices.map(({ spice, percentage }) => (
-                    <div key={spice.id} className="flex items-center p-3 bg-orange-50 rounded-lg">
-                      <div
-                        className="w-8 h-8 rounded-full mr-3 flex items-center justify-center"
-                        style={{ backgroundColor: spice.color }}
-                      >
-                        <SpiceIcon 
-                          iconName={spice.icon} 
-                          className="w-4 h-4" 
-                          style={{ color: spice.color === '#F5F5DC' || spice.color === '#F5DEB3' ? '#8B4513' : 'white' }}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900">{spice.name}</div>
-                        <div className="text-sm text-gray-600">{percentage}%</div>
-                      </div>
+                <div className="p-6 space-y-6">
+                  {/* Blend Composition */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Beaker className="w-5 h-5 mr-2 text-purple-600" />
+                      Blend Composition
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {selectedSpices.map(({ spice, percentage }) => (
+                        <div key={spice.id} className="flex items-center p-3 bg-orange-50 rounded-lg">
+                          <div
+                            className="w-8 h-8 rounded-full mr-3 flex items-center justify-center"
+                            style={{ backgroundColor: spice.color }}
+                          >
+                            <SpiceIcon 
+                              iconName={spice.icon} 
+                              className="w-4 h-4" 
+                              style={{ color: spice.color === '#F5F5DC' || spice.color === '#F5DEB3' ? '#8B4513' : 'white' }}
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">{spice.name}</div>
+                            <div className="text-sm text-gray-600">{percentage}%</div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Flavor Profile */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2 text-orange-600" />
-                  Flavor Profile
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {blendSummary.flavorProfile.map((flavor, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
-                    >
-                      {flavor}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Common Uses */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <ChefHat className="w-5 h-5 mr-2 text-orange-600" />
-                  Perfect For
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {blendSummary.commonUses.map((use, index) => (
-                    <div key={index} className="flex items-center">
-                      <div className="w-2 h-2 bg-orange-400 rounded-full mr-2" />
-                      <span className="text-gray-700">{use}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Similar Blends */}
-              {blendSummary.similarBlends.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Similar to These Blends
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {blendSummary.similarBlends.map((blend, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
-                      >
-                        {blend}
-                      </span>
-                    ))}
                   </div>
-                </div>
-              )}
 
-              {/* Actions */}
-              <div className="flex space-x-4 pt-4 border-t border-gray-200">
-                {user && (
-                  <button
-                    onClick={handleSaveBlend}
-                    disabled={savingBlend}
-                    className={`flex-1 px-6 py-3 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center ${
-                      savingBlend
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transform hover:scale-105'
-                    }`}
-                  >
-                    {savingBlend ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4 mr-2" />
-                        Save Blend
-                      </>
+                  {/* Flavor Profile */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Sparkles className="w-5 h-5 mr-2 text-orange-600" />
+                      Flavor Profile
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {blendSummary.flavorProfile.map((flavor, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
+                        >
+                          {flavor}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Common Uses */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <ChefHat className="w-5 h-5 mr-2 text-orange-600" />
+                      Perfect For
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {blendSummary.commonUses.map((use, index) => (
+                        <div key={index} className="flex items-center">
+                          <div className="w-2 h-2 bg-orange-400 rounded-full mr-2" />
+                          <span className="text-gray-700">{use}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Similar Blends */}
+                  {blendSummary.similarBlends.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Similar to These Blends
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {blendSummary.similarBlends.map((blend, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
+                          >
+                            {blend}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex space-x-4 pt-4 border-t border-gray-200">
+                    {user && (
+                      <button
+                        onClick={handleSaveBlend}
+                        disabled={savingBlend}
+                        className={`flex-1 px-6 py-3 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center ${
+                          savingBlend
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transform hover:scale-105'
+                        }`}
+                      >
+                        {savingBlend ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4 mr-2" />
+                            Save Blend
+                          </>
+                        )}
+                      </button>
                     )}
-                  </button>
-                )}
-                <button
-                  onClick={resetBlend}
-                  className={`px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105 ${
-                    user ? 'flex-1' : 'w-full'
-                  }`}
-                >
-                  Create Another Blend
-                </button>
+                    <button
+                      onClick={resetBlend}
+                      className={`px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105 ${
+                        user ? 'flex-1' : 'w-full'
+                      }`}
+                    >
+                      Create Another Blend
+                    </button>
+                  </div>
+
+                  {/* Save Status Messages */}
+                  {saveSuccess && (
+                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl">
+                      <p className="text-green-700 text-sm flex items-center">
+                        <Save className="w-4 h-4 mr-2" />
+                        Blend saved successfully!
+                      </p>
+                    </div>
+                  )}
+
+                  {saveError && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                      <p className="text-red-700 text-sm">{saveError}</p>
+                    </div>
+                  )}
+                </div>
               </div>
-
-              {/* Save Status Messages */}
-              {saveSuccess && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl">
-                  <p className="text-green-700 text-sm flex items-center">
-                    <Save className="w-4 h-4 mr-2" />
-                    Blend saved successfully!
-                  </p>
-                </div>
-              )}
-
-              {saveError && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
-                  <p className="text-red-700 text-sm">{saveError}</p>
-                </div>
-              )}
             </div>
-          </div>
-        </div>
 
             {/* Saved Blends Sidebar */}
             {user && (
@@ -394,12 +393,13 @@ export const SpiceBlender: React.FC<SpiceBlenderProps> = ({ spices, user }) => {
     );
   }
 
+  // Main blend builder interface
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            Spice Blender
+            Custom Spice Blend Maker
           </h1>
           <p className="text-gray-600 mt-1">Create your perfect spice blend</p>
         </div>
