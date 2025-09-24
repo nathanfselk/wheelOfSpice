@@ -9,13 +9,6 @@ const hasValidCredentials = supabaseUrl &&
   supabaseUrl !== 'https://your-project-ref.supabase.co' &&
   supabaseAnonKey !== 'your-anon-key-here'
 
-if (!hasValidCredentials) {
-  console.error('Missing Supabase environment variables. Please check your .env file.')
-  console.error('Required variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY')
-  console.error('Current URL:', supabaseUrl)
-  console.error('Current Key:', supabaseAnonKey ? '[REDACTED]' : 'undefined')
-}
-
 // Create a mock client if credentials are invalid to prevent fetch errors
 export const supabase = hasValidCredentials 
   ? createClient(supabaseUrl, supabaseAnonKey)
