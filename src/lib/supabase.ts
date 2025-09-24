@@ -6,6 +6,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 console.log('Supabase Configuration Check:')
 console.log('URL:', supabaseUrl ? 'Set' : 'Missing')
 console.log('Anon Key:', supabaseAnonKey ? 'Set' : 'Missing')
+console.log('Full URL:', supabaseUrl)
+console.log('Key length:', supabaseAnonKey ? supabaseAnonKey.length : 0)
 
 // Check if we have valid Supabase credentials
 const hasValidCredentials = supabaseUrl && 
@@ -17,6 +19,25 @@ const hasValidCredentials = supabaseUrl &&
 
 console.log('Has Valid Credentials:', hasValidCredentials)
 
+// Test network connectivity to Supabase
+if (hasValidCredentials) {
+  fetch(`${supabaseUrl}/rest/v1/`, {
+    method: 'HEAD',
+    headers: {
+      'apikey': supabaseAnonKey,
+      'Authorization': `Bearer ${supabaseAnonKey}`
+    }
+  }).then(response => {
+    console.log('Supabase connectivity test:', response.status === 200 ? 'SUCCESS' : `FAILED (${response.status})`)
+  }).catch(error => {
+    console.error('Supabase connectivity test FAILED:', error.message)
+    console.error('This usually means:')
+    console.error('1. Invalid Supabase URL or API key')
+    console.error('2. Network/firewall blocking the connection')
+    console.error('3. Supabase project is paused or deleted')
+  })
+}
+
 // Create a mock client if credentials are invalid to prevent fetch errors
 export const supabase = hasValidCredentials 
   ? createClient(supabaseUrl, supabaseAnonKey, {
@@ -24,7 +45,8 @@ export const supabase = hasValidCredentials
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
-        flowType: 'pkce'
+        flowType: 'pkce',
+        debug: true
       }
     })
   : {
