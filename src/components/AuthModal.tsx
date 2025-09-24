@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, Mail, Lock, User, RefreshCw } from 'lucide-react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { supabase } from '../lib/supabase';
 import { rateLimitService } from '../services/rateLimitService';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -26,9 +26,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [showCaptcha, setShowCaptcha] = useState(false);
   const [rateLimitError, setRateLimitError] = useState('');
+
+  // Check if Supabase is configured
+  const [supabaseConfigured, setSupabaseConfigured] = useState(true);
+
+  useEffect(() => {
+    // Check Supabase configuration on mount
+    import('../lib/supabase').then(({ isSupabaseConfigured }) => {
+      setSupabaseConfigured(isSupabaseConfigured());
+    });
+  }, []);
+
+  // Lock body scroll when modal is open
+  useBodyScrollLock(isOpen);
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
@@ -76,6 +87,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if Supabase is configured
+    if (!supabaseConfigured) {
+      setError('Authentication service is not configured. Please check your environment variables.');
+      return;
+    }
+    
     setError('');
     setRateLimitError('');
     
@@ -87,12 +105,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    // For signup, require CAPTCHA after showing it
-    if (!isLogin && showCaptcha && !captchaToken) {
-      setError('Please complete the CAPTCHA verification.');
-      return;
-    }
-    
     setError('');
     setLoading(true);
 
@@ -101,12 +113,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       rateLimitService.recordAttempt(action, email);
       
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
         if (error) {
+          console.error('Login error:', error);
           const newAttempts = loginAttempts + 1;
           setLoginAttempts(newAttempts);
           
@@ -115,10 +128,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             setShowPasswordReset(true);
             setResetEmail(email);
           } else {
-            setError(`${error.message} (${newAttempts}/3 attempts)`);
+            // Provide user-friendly error messages
+            let errorMessage = error.message;
+            if (error.message.includes('Invalid login credentials')) {
+              errorMessage = 'Invalid email or password';
+            } else if (error.message.includes('Email not confirmed')) {
+              errorMessage = 'Please check your email and click the confirmation link';
+            }
+            setError(`${errorMessage} (${newAttempts}/3 attempts)`);
           }
           setLoading(false);
           return;
+        } else if (data.user) {
+          console.log('Login successful for user:', data.user.email);
         }
       } else {
         // Validate password for signup
@@ -129,27 +151,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           return;
         }
 
-        // For signup, show CAPTCHA on first attempt
-        if (!showCaptcha) {
-          setShowCaptcha(true);
-          setLoading(false);
-          return;
-        }
-
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/verify-email`,
-            captchaToken: captchaToken || undefined
+            emailRedirectTo: `${window.location.origin}/verify-email`
           }
         });
         
         if (error) {
-          // Reset CAPTCHA on error
-          setCaptchaToken(null);
-          setShowCaptcha(false);
           throw error;
+        } else if (data.user) {
+          console.log('Signup successful for user:', data.user.email);
+          // Show success message for signup
+          setError('Account created! Please check your email for verification.');
         }
       }
 
@@ -159,6 +174,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setPassword('');
       setLoginAttempts(0);
     } catch (error: any) {
+      console.error('Auth error:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -175,8 +191,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setShowPasswordReset(false);
     setResetEmail('');
     setResetSuccess(false);
-    setCaptchaToken(null);
-    setShowCaptcha(false);
   };
 
   const switchMode = () => {
@@ -325,6 +339,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Form */}
         <div className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Supabase Configuration Warning */}
+            {!supabaseConfigured && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                <p className="text-yellow-700 text-sm">
+                  ⚠️ Authentication service is not properly configured. Please check your environment variables.
+                </p>
+              </div>
+            )}
+
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -375,18 +398,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
             </div>
 
-            {/* CAPTCHA for signup */}
-            {!isLogin && showCaptcha && (
-              <div className="flex justify-center">
-                <HCaptcha
-                  sitekey="ES_4abcadd52d0f49d49a4dd77b80ca159f"
-                  onVerify={(token) => setCaptchaToken(token)}
-                  onExpire={() => setCaptchaToken(null)}
-                  onError={() => setCaptchaToken(null)}
-                />
-              </div>
-            )}
-
             {/* Rate Limit Error */}
             {rateLimitError && (
               <div className="bg-orange-50 border border-orange-200 rounded-xl p-3">
@@ -418,16 +429,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !supabaseConfigured}
               className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200 ${
-                loading
+                loading || !supabaseConfigured
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : (!isLogin && showCaptcha && !captchaToken)
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105'
               }`}
             >
-              {loading ? 'Please wait...' : (isLogin ? 'Sign In' : (!showCaptcha ? 'Continue' : 'Create Account'))}
+              {!supabaseConfigured 
+                ? 'Service Unavailable'
+                : loading 
+                  ? 'Please wait...' 
+                  : (isLogin ? 'Sign In' : 'Create Account')
+              }
             </button>
           </form>
 
