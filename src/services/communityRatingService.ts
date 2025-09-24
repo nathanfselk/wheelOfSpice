@@ -70,7 +70,10 @@ export class CommunityRatingService {
         .in('spice_id', spiceIds);
 
       if (error) {
-        console.error('Error getting community ratings:', error);
+        // Only log actual errors, not configuration issues
+        if (error.message !== 'Supabase not configured') {
+          console.error('Error getting community ratings:', error);
+        }
         return {};
       }
 
