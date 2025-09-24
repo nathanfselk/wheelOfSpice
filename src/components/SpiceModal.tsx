@@ -6,6 +6,7 @@ import { SpiceIcon } from './SpiceIcon';
 import { CommunityRating } from '../services/communityRatingService';
 import { stripeProducts } from '../stripe-config';
 import { isPurchasingEnabled } from '../config/features';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
 interface SpiceModalProps {
   spice: Spice;
@@ -30,6 +31,9 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
 }) => {
   const [currentRating, setCurrentRating] = useState(initialRating || 5);
   const [addingToCart, setAddingToCart] = useState(false);
+
+  // Lock body scroll when modal is open
+  useBodyScrollLock(true);
 
   // Find corresponding product for this spice
   const product = stripeProducts.find(p => p.name === spice.name);
@@ -248,9 +252,30 @@ export const SpiceModal: React.FC<SpiceModalProps> = ({
                   <div className="text-2xl font-bold text-purple-600">
                     {communityRating.average_rating.toFixed(1)}/10
                   </div>
+                 <div className="text-sm text-gray-600 mt-1">
+                   Based on {communityRating.total_ratings} rating{communityRating.total_ratings !== 1 ? 's' : ''}
+                 </div>
                 </div>
               </div>
             )}
+
+           {/* Show message when no community rating exists */}
+           {!communityRating && (
+             <div className="bg-gray-50 rounded-xl p-4">
+               <div className="flex items-center mb-3">
+                 <Star className="w-5 h-5 text-gray-400 mr-2" />
+                 <h3 className="font-semibold text-gray-900">Community Rating</h3>
+               </div>
+               <div className="text-center">
+                 <div className="text-gray-500">
+                   No community ratings yet
+                 </div>
+                 <div className="text-sm text-gray-400 mt-1">
+                   Be the first to rate this spice!
+                 </div>
+               </div>
+             </div>
+           )}
           </div>
 
           {/* Common Uses */}
