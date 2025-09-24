@@ -399,7 +399,6 @@ function App() {
           onAuthClick={() => setShowAuthModal(true)}
           onSignOut={handleSignOut}
         />
-        <SpiceBlender spices={spices} />
         <SpiceBlender spices={spices} user={user} />
       </>
     );
@@ -585,6 +584,7 @@ function App() {
           onClearCart={clearCart}
           user={user}
         />
+      )}
     </div>
     </>
   );
