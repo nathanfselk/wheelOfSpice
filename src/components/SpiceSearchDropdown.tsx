@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, Plus } from 'lucide-react';
+import { Search, ChevronDown, Plus, ShoppingCart } from 'lucide-react';
 import { Spice } from '../types/spice';
 import { SpiceIcon } from './SpiceIcon';
+import { isPurchasingEnabled } from '../config/features';
+import { stripeProducts } from '../stripe-config';
 
 interface SpiceSearchDropdownProps {
   spices: Spice[];
@@ -9,6 +11,8 @@ interface SpiceSearchDropdownProps {
   onMissingSpiceClick: () => void;
   excludeSpices?: string[];
   isLoggedIn?: boolean;
+  onAddToCart?: (product: any, spice: any) => void;
+  getItemQuantity?: (productId: string) => number;
 }
 
 export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
@@ -16,10 +20,13 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
   onSpiceSelect,
   onMissingSpiceClick,
   excludeSpices = [],
-  isLoggedIn = false
+  isLoggedIn = false,
+  onAddToCart,
+  getItemQuantity
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const filteredSpices = spices.filter(spice => 
@@ -44,6 +51,21 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
     setSearchTerm('');
   };
 
+  const handleAddToCart = (spice: Spice, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!onAddToCart || !isPurchasingEnabled()) return;
+    
+    const product = stripeProducts.find(p => p.name === spice.name);
+    if (!product) return;
+    
+    setAddingToCart(spice.id);
+    onAddToCart(product, spice);
+    
+    setTimeout(() => {
+      setAddingToCart(null);
+    }, 500);
+  };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -89,7 +111,8 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
                 onClick={() => handleSpiceSelect(spice)}
                 className="px-4 py-3 hover:bg-orange-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0"
               >
-                <div className="flex items-center">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center flex-1">
                   <div 
                     className="w-8 h-8 rounded-full mr-3 border border-gray-200 flex items-center justify-center"
                     style={{ backgroundColor: spice.color }}
@@ -115,6 +138,28 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
                     </div>
                     <div className="text-sm text-gray-500">{spice.origin}</div>
                   </div>
+                  
+                  {/* Cart Button */}
+                  {isPurchasingEnabled() && onAddToCart && stripeProducts.find(p => p.name === spice.name) && (
+                    <button
+                      onClick={(e) => handleAddToCart(spice, e)}
+                      disabled={addingToCart === spice.id}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ml-2 ${
+                        addingToCart === spice.id
+                          ? 'bg-green-500 text-white'
+                          : getItemQuantity && getItemQuantity(spice.id) > 0
+                            ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-orange-100 hover:text-orange-600'
+                      }`}
+                      title={addingToCart === spice.id ? 'Adding...' : 'Add to cart'}
+                    >
+                      {addingToCart === spice.id ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <ShoppingCart className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             ))

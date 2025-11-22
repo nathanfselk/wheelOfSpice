@@ -232,7 +232,10 @@ export const CartModal: React.FC<CartModalProps> = ({
                     Processing...
                   </>
                 ) : !user ? (
-                  'Sign In to Checkout'
+                  <>
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Sign In to Checkout
+                  </>
                 ) : (
                   <>
                     <ShoppingCart className="w-4 h-4 mr-2" />

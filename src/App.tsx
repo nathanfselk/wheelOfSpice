@@ -471,6 +471,8 @@ function App() {
         {user && (
           <EmailVerificationBanner 
             userEmail={user.email || undefined}
+            onAddToCart={handleAddToCart}
+            getItemQuantity={getItemQuantity}
           />
         )}
         
@@ -480,6 +482,8 @@ function App() {
             <SpiceWheel
               availableSpices={availableSpices}
               onSpiceSelect={handleSpiceSelect}
+              onAddToCart={handleAddToCart}
+              getItemQuantity={getItemQuantity}
             />
           </div>
         )}

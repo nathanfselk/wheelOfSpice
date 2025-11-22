@@ -235,6 +235,21 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
                 </button>
               </div>
             ) : (
+              <div className="flex items-center space-x-3">
+                {/* Cart Button for Anonymous Users */}
+                {isPurchasingEnabled() && cart.totalItems > 0 && (
+                  <button
+                    onClick={() => setShowCart(true)}
+                    className="relative flex items-center px-3 py-2 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors text-sm"
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2 text-orange-600" />
+                    <span className="text-orange-600 font-medium">Cart</span>
+                    <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                      {cart.totalItems}
+                    </div>
+                  </button>
+                )}
+                
               <button
                 onClick={onAuthClick}
                 className="flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 text-sm"
@@ -242,6 +257,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
                 <User className="w-4 h-4 mr-2" />
                 Log In / Sign Up
               </button>
+              </div>
             )}
           </div>
         </div>
