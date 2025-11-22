@@ -138,6 +138,7 @@ export const SpiceSearchDropdown: React.FC<SpiceSearchDropdownProps> = ({
                     </div>
                     <div className="text-sm text-gray-500">{spice.origin}</div>
                   </div>
+                  </div>
                   
                   {/* Cart Button */}
                   {isPurchasingEnabled() && onAddToCart && stripeProducts.find(p => p.name === spice.name) && (
